@@ -1,0 +1,261 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Why do we need Neglect? - Foundational Proposal</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="neglect.html"><strong aria-hidden="true">1.</strong> Spotlight: Neglect</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="neglect-why.html" class="active"><strong aria-hidden="true">1.1.</strong> Why do we need Neglect?</a></li><li class="chapter-item expanded "><a href="neglect-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Neglect a const parameter?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Foundational Proposal</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#why-do-we-need-neglect" id="why-do-we-need-neglect">Why do we need Neglect?</a></h1>
+<p>The ability to neglect particular static checks makes <code>BikeshedIntrinsicFrom</code> useful in scenarios where aspects of well-definedness and safety are ensured through other means.</p>
+<h2><a class="header" href="#example-neglecting-alignment" id="example-neglecting-alignment">Example: Neglecting Alignment</a></h2>
+<p>For the instantiation of a <code>&amp;'dst Dst</code> from any <code>&amp;'src Src</code> to be safe, the minimum required alignment of all <code>Src</code> must be stricter than the minimum required alignment of <code>Dst</code>, among other factors (e.g., <code>'src</code> must outlive <code>'dst</code>). By default, <code>BikeshedIntrinsicFrom</code> will enforce these requirements statically.</p>
+<p>However, for the instantiation of a <code>&amp;'dst Dst</code> from a <em>particular</em> <code>&amp;'src Src</code> to be safe, we can just check that the alignment of that <em>particular</em> <code>&amp;'src Src</code> is sufficient using <code>mem::align_of</code> (e.g., see bytemuck's <a href="https://docs.rs/bytemuck/1.4.1/bytemuck/fn.try_cast_ref.html">try_cast_ref</a> method).</p>
+<p>Using a <code>NEGLECT</code> parameter of <code>Neglect {alignment: true, ..Neglect::NOTHING}</code> makes <code>BikeshedIntrinsicFrom</code> useful in this scenario. With that <code>NEGLECT</code> parameter, <code>BikeshedIntrinsicFrom</code> neglects only its static alignment check, which we then assume responsibility to enforce ourselves; e.g.:</p>
+<pre><code class="language-rust ignore">
+const NEGLECT_ALIGNMENT : NEGLECT = Neglect {alignment: true, ..Neglect::NOTHING};
+
+/// Try to convert a `&amp;'src Src` into `&amp;'dst Dst`.
+///
+/// This produces `None` if the referent isn't appropriately
+/// aligned, as required by the destination type.
+fn try_cast_ref&lt;'src, 'dst, Src, Dst, Scope&gt;(src: &amp;'src Src) -&gt; Option&lt;&amp;'dst Dst&gt;
+where
+    &amp;'t T: BikeshedIntrinsicFrom&lt;&amp;'dst Dst, Scope, NEGLECT_ALIGNMENT&gt;,
+{
+    // check alignment dynamically
+    if (src as *const Src as usize) % align_of::&lt;Dst&gt;() != 0 {
+        None
+    } else {
+        // SAFETY: we've dynamically enforced the alignment requirement.
+        // `BikeshedIntrinsicFrom` statically enforces all other safety reqs.
+        unsafe { &amp;*(src as *const Src as *const Dst) }
+    }
+}
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="neglect.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="neglect-encoding.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="neglect.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="neglect-encoding.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

@@ -1,0 +1,17 @@
+# Summary
+
+[Overview](./introduction.md)
+- [Spotlight: `Neglect`](./neglect.md)
+  - [Why do we need `Neglect`?](./neglect-why.md)
+  - [Why is `Neglect` a `const` parameter?](./neglect-encoding.md)
+- [Spotlight: `Scope`](./scope.md)
+  - [Why is safety dependent on context?](./scope-safety.md)
+  - [How does `Scope` ensure safety?](./scope-mechanism.md)
+  - [Can't `Scope` be elided?](./scope-inference.md)
+- [Use-Case: Auditing](./use-case-auditing.md)
+- [Use-Case: Abstraction](./use-case-abstraction.md)
+- [Unresolved Questions](./unresolved.md)
+  - [Trait Name](./unresolved-trait-name.md)
+  - [Trait Methods](./unresolved-trait-methods.md)
+  - [Trait Orientation](./unresolved-trait-orientation.md)
+  - [Visibility of Src](./unresolved-src-visibility.md)

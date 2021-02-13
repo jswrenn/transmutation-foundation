@@ -11,7 +11,7 @@ mod a {
 
     #[repr(C)]
     pub struct NonZeroU32(u32);
-    
+
     impl NonZeroU32 {
         fn new(v: u32) -> Self {
             unsafe { core::mem::transmute(v) } // sound.

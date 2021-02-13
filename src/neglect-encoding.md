@@ -9,4 +9,4 @@ The type parameter approaches we've considered tick both the first box, and *eit
 In contrast:
 1. A const generic `Neglect` parameter is *not* (yet) defaultable, but this doesn't seem like a permanent limitation of const generics.
 2. The const generic `Neglect` admits exactly one encoding of each subset. The value produced by `Neglect {alignment: true, validity: true}` is identical to the value produced by `Neglect {validity: true, alignment: true}`.
-3. The const generic `Neglect` is generically extendable. Given an existing, arbitrary `NEGLECT`, we additionally can disable the alignment check with `{Neglect { alignment: true, ..NEGLECT }}`.
+3. The const generic `Neglect` is generically extendable. Given an existing, arbitrary `NEGLECT`, we additionally can disable the alignment check with `{Neglect::ALIGNMENT + NEGLECT}`.

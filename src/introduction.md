@@ -44,12 +44,30 @@ pub struct Neglect {
 }
 
 impl Neglect {
-    pub const NOTHING: Self = Neglect {
+    pub const NOTHING: Self = Self {
         alignment   : false,
         lifetimes   : false,
         validity    : false,
         visibility  : false,
     };
+
+    pub const ALIGNMENT:  Self = Self {alignment: true, ..Self::NOTHING};
+    pub const LIFETIMES:  Self = Self {lifetimes: true, ..Self::NOTHING};
+    pub const VALIDITY:   Self = Self {validity:  true, ..Self::NOTHING};
+    pub const VISIBILITY: Self = Self {validity:  true, ..Self::NOTHING};
+}
+
+impl const core::ops::Add for Neglect {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        Self {
+            alignment   : self.alignment  || other.alignment,
+            lifetimes   : self.lifetimes  || other.lifetimes,
+            validity    : self.validity   || other.validity,
+            visibility  : self.visibility || other.visibility,
+        }
+    }
 }
 ```
 

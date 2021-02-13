@@ -1,5 +1,7 @@
 # How does `Scope` ensure safety?
 
+It's generally unsound to construct instances of types for which you do not have a constructor.
+
 If `BikeshedIntrinsicFrom` *lacked* a `Scope` parameter; e.g.,:
 ```rust,ignore
 // we'll also omit `NEGLECT` for brevity
@@ -13,27 +15,39 @@ where
 mod a {
     use super::*;
 
-    #[repr(C)]
-    pub struct NonZeroU32(u32);
-    
-    impl NonZeroU32 {
-        fn new(v: u32) -> Self {
-            assert_impl!(NonZeroU32: BikeshedIntrinsicFrom<u32>);
-            unsafe { core::mem::transmute(v) } // sound.
+    mod npc {
+        #[repr(C)]
+        pub struct NoPublicConstructor(u32);
+        
+        impl NoPublicConstructor {
+            pub(super) fn new(v: u32) -> Self {
+                assert!(v % 2 == 0);
+                assert_impl!(NoPublicConstructor: BikeshedIntrinsicFrom<u32>);
+                unsafe { core::mem::transmute(v) } // okay.
+            }
+
+            pub fn method(self) {
+                if self.0 % 2 == 1 {
+                    // totally unreachable, thanks to assert in `Self::new`
+                    unsafe { *std::ptr::null() }
+                }
+            }
         }
     }
+
+    use npc::NoPublicConstructor;
 }
 
 mod b {
     use super::*;
 
-    fn new(v: u32) -> a::NonZeroU32 {
-        assert_not_impl!(NonZeroU32: BikeshedIntrinsicFrom<u32>);
-        unsafe { core::mem::transmute(v) } // ☢️ UNSOUND!
+    fn new(v: u32) -> a::NoPublicConstructor {
+        assert_not_impl!(NoPublicConstructor: BikeshedIntrinsicFrom<u32>);
+        unsafe { core::mem::transmute(v) } // ☢️ BAD!
     }
 }
 ```
-In module `a`, `NonZeroU32` must implement `BikeshedIntrinsicFrom<u32>`. In module `b`, it must not. This inconsistency is incompatible with Rust's trait system.
+In module `a`, `NoPublicConstructor` must implement `BikeshedIntrinsicFrom<u32>`. In module `b`, it must not. This inconsistency is incompatible with Rust's trait system.
 
 ## Solution
 
@@ -52,28 +66,40 @@ For example:
 mod a {
     use super::*;
 
-    #[repr(C)]
-    pub struct NonZeroU32(u32);
-    
-    impl NonZeroU32 {
-        fn new(v: u32) -> Self {
-            struct A; // a private type that represents this context
-            assert_impl!(NonZeroU32: BikeshedIntrinsicFrom<u32, A>);
-            unsafe { core::mem::transmute(v) } // sound.
+    mod npc {
+        #[repr(C)]
+        pub struct NoPublicConstructor(u32);
+        
+        impl NoPublicConstructor {
+            pub(super) fn new(v: u32) -> Self {
+                assert!(v % 2 == 0);
+                struct A; // a private type that represents this context
+                assert_impl!(NoPublicConstructor: BikeshedIntrinsicFrom<u32, A>);
+                unsafe { core::mem::transmute(v) } // okay.
+            }
+
+            pub fn method(self) {
+                if self.0 % 2 == 1 {
+                    // totally unreachable, thanks to assert in `Self::new`
+                    unsafe { *std::ptr::null() }
+                }
+            }
         }
     }
+
+    use npc::NoPublicConstructor;
 }
 
 mod b {
     use super::*;
 
-    fn new(v: u32) -> a::NonZeroU32 {
+    fn new(v: u32) -> a::NoPublicConstructor {
         struct B; // a private type that represents this context
-        assert_not_impl!(NonZeroU32: BikeshedIntrinsicFrom<u32, B>);
-        unsafe { core::mem::transmute(v) } // ☢️ UNSOUND!
+        assert_not_impl!(NoPublicConstructor: BikeshedIntrinsicFrom<u32, B>);
+        unsafe { core::mem::transmute(v) } // ☢️ BAD!
     }
 }
 ```
 
-In module `a`, `NonZeroU32` implements `BikeshedIntrinsicFrom<u32, A>`. In module `b`, `NonZeroU32` does *not* implement `BikeshedIntrinsicFrom<u32, B>`. There is no inconsistency.
+In module `a`, `NoPublicConstructor` implements `BikeshedIntrinsicFrom<u32, A>`. In module `b`, `NoPublicConstructor` does *not* implement `BikeshedIntrinsicFrom<u32, B>`. There is no inconsistency.
 

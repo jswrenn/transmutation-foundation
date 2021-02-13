@@ -18,7 +18,7 @@ mod downstream {
         use core::{slice, mem::size_of};
         
         unsafe {
-            slice::from_raw_parts(t as *const T, size_of::<T>())
+            slice::from_raw_parts(t as *const T as *const u8, size_of::<T>())
         }
     }
 }

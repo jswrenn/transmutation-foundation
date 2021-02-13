@@ -4,6 +4,7 @@
 - [Spotlight: `Neglect`](./neglect.md)
   - [Why do we need `Neglect`?](./neglect-why.md)
   - [Why is `Neglect` a `const` parameter?](./neglect-encoding.md)
+  - [How should `Neglect`s be created, combined?](./neglect-combining.md)
 - [Spotlight: `Scope`](./scope.md)
   - [Why is safety dependent on context?](./scope-safety.md)
   - [How does `Scope` ensure safety?](./scope-mechanism.md)

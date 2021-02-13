@@ -21,7 +21,11 @@ macro_rules! transmute {
 
         struct Scope;
 
-        const NEGLECT: Neglect = Neglect { $($neglect: true,)* ..Neglect::NOTHING};
+        const NEGLECT: Neglect = {
+            let mut neglect = Neglect::NOTHING;
+            $(neglect . $neglect = true;)*
+            neglect
+        };
 
         transmute::<_, _, Scope, NEGLECT>($src)
     }};
@@ -37,14 +41,14 @@ unsafe fn foo(v: u8) -> bool {
 Swapping `mem::transmute` out for our macro (rightfully) produces a compile error:
 ```rust,ignore
 unsafe fn foo(v: u8) -> bool {
-    transmute!(v) // Compile Error!
+    unsafe { transmute!(v) } // Compile Error!
 }
 ```
 ...that we may resolve by explicitly neglecting validity:
 ```rust,ignore
 fn foo(v: u8) -> bool {
     assert!(v < 2);
-    transmute!(v, Neglect { validity })
+    unsafe { transmute!(v, Neglect { validity }) }
 }
 ```
 

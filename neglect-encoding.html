@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="neglect.html"><strong aria-hidden="true">1.</strong> Spotlight: Neglect</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="neglect-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Neglect?</a></li><li class="chapter-item expanded "><a href="neglect-encoding.html" class="active"><strong aria-hidden="true">1.2.</strong> Why is Neglect a const parameter?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="neglect.html"><strong aria-hidden="true">1.</strong> Spotlight: Neglect</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="neglect-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Neglect?</a></li><li class="chapter-item expanded "><a href="neglect-encoding.html" class="active"><strong aria-hidden="true">1.2.</strong> Why is Neglect a const parameter?</a></li><li class="chapter-item expanded "><a href="neglect-combining.html"><strong aria-hidden="true">1.3.</strong> How should Neglects be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -175,7 +175,7 @@
 <ol>
 <li>A const generic <code>Neglect</code> parameter is <em>not</em> (yet) defaultable, but this doesn't seem like a permanent limitation of const generics.</li>
 <li>The const generic <code>Neglect</code> admits exactly one encoding of each subset. The value produced by <code>Neglect {alignment: true, validity: true}</code> is identical to the value produced by <code>Neglect {validity: true, alignment: true}</code>.</li>
-<li>The const generic <code>Neglect</code> is generically extendable. Given an existing, arbitrary <code>NEGLECT</code>, we additionally can disable the alignment check with <code>{Neglect { alignment: true, ..NEGLECT }}</code>.</li>
+<li>The const generic <code>Neglect</code> is generically extendable. Given an existing, arbitrary <code>NEGLECT</code>, we additionally can disable the alignment check with <code>{Neglect::ALIGNMENT + NEGLECT}</code>.</li>
 </ol>
 
                     </main>
@@ -189,7 +189,7 @@
                         
 
                         
-                            <a rel="next" href="scope.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="neglect-combining.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -207,7 +207,7 @@
                 
 
                 
-                    <a rel="next" href="scope.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="neglect-combining.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

@@ -97,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="neglect.html"><strong aria-hidden="true">1.</strong> Spotlight: Neglect</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="neglect-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Neglect?</a></li><li class="chapter-item expanded "><a href="neglect-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Neglect a const parameter?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="neglect.html"><strong aria-hidden="true">1.</strong> Spotlight: Neglect</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="neglect-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Neglect?</a></li><li class="chapter-item expanded "><a href="neglect-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Neglect a const parameter?</a></li><li class="chapter-item expanded "><a href="neglect-combining.html"><strong aria-hidden="true">1.3.</strong> How should Neglects be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -206,12 +206,30 @@ pub struct Neglect {
 }
 
 impl Neglect {
-    pub const NOTHING: Self = Neglect {
+    pub const NOTHING: Self = Self {
         alignment   : false,
         lifetimes   : false,
         validity    : false,
         visibility  : false,
     };
+
+    pub const ALIGNMENT:  Self = Self {alignment: true, ..Self::NOTHING};
+    pub const LIFETIMES:  Self = Self {lifetimes: true, ..Self::NOTHING};
+    pub const VALIDITY:   Self = Self {validity:  true, ..Self::NOTHING};
+    pub const VISIBILITY: Self = Self {validity:  true, ..Self::NOTHING};
+}
+
+impl const core::ops::Add for Neglect {
+    type Output = Self;
+
+    fn add(self, other: Self) -&gt; Self {
+        Self {
+            alignment   : self.alignment  || other.alignment,
+            lifetimes   : self.lifetimes  || other.lifetimes,
+            validity    : self.validity   || other.validity,
+            visibility  : self.visibility || other.visibility,
+        }
+    }
 }
 </code></pre>
 <p><strong>For more information, see <a href="neglect.html">here</a>.</strong></p>
@@ -224,23 +242,21 @@ impl Neglect {
 <ul>
 <li><a href="./neglect-why.html">Why do we need <code>Neglect</code>?</a></li>
 <li><a href="./neglect-encoding.html">Why is <code>Neglect</code> a <code>const</code> parameter?</a></li>
+<li><a href="./neglect-combining.html">How should <code>Neglect</code> values be created, combined?</a></li>
 </ul>
 <h1><a class="header" href="#why-do-we-need-neglect" id="why-do-we-need-neglect">Why do we need Neglect?</a></h1>
 <p>The ability to neglect particular static checks makes <code>BikeshedIntrinsicFrom</code> useful in scenarios where aspects of well-definedness and safety are ensured through other means.</p>
 <h2><a class="header" href="#example-neglecting-alignment" id="example-neglecting-alignment">Example: Neglecting Alignment</a></h2>
 <p>For the instantiation of a <code>&amp;'dst Dst</code> from any <code>&amp;'src Src</code> to be safe, the minimum required alignment of all <code>Src</code> must be stricter than the minimum required alignment of <code>Dst</code>, among other factors (e.g., <code>'src</code> must outlive <code>'dst</code>). By default, <code>BikeshedIntrinsicFrom</code> will enforce these requirements statically.</p>
 <p>However, for the instantiation of a <code>&amp;'dst Dst</code> from a <em>particular</em> <code>&amp;'src Src</code> to be safe, we can just check that the alignment of that <em>particular</em> <code>&amp;'src Src</code> is sufficient using <code>mem::align_of</code> (e.g., see bytemuck's <a href="https://docs.rs/bytemuck/1.4.1/bytemuck/fn.try_cast_ref.html">try_cast_ref</a> method).</p>
-<p>Using a <code>NEGLECT</code> parameter of <code>Neglect {alignment: true, ..Neglect::NOTHING}</code> makes <code>BikeshedIntrinsicFrom</code> useful in this scenario. With that <code>NEGLECT</code> parameter, <code>BikeshedIntrinsicFrom</code> neglects only its static alignment check, which we then assume responsibility to enforce ourselves; e.g.:</p>
-<pre><code class="language-rust ignore">
-const NEGLECT_ALIGNMENT : NEGLECT = Neglect {alignment: true, ..Neglect::NOTHING};
-
-/// Try to convert a `&amp;'src Src` into `&amp;'dst Dst`.
+<p>Using a <code>NEGLECT</code> parameter of <code>Neglect::ALIGNMENT</code> makes <code>BikeshedIntrinsicFrom</code> useful in this scenario. With that <code>NEGLECT</code> parameter, <code>BikeshedIntrinsicFrom</code> neglects only its static alignment check, which we then assume responsibility to enforce ourselves; e.g.:</p>
+<pre><code class="language-rust ignore">/// Try to convert a `&amp;'src Src` into `&amp;'dst Dst`.
 ///
 /// This produces `None` if the referent isn't appropriately
 /// aligned, as required by the destination type.
 fn try_cast_ref&lt;'src, 'dst, Src, Dst, Scope&gt;(src: &amp;'src Src) -&gt; Option&lt;&amp;'dst Dst&gt;
 where
-    &amp;'t T: BikeshedIntrinsicFrom&lt;&amp;'dst Dst, Scope, NEGLECT_ALIGNMENT&gt;,
+    &amp;'t T: BikeshedIntrinsicFrom&lt;&amp;'dst Dst, Scope, Neglect::ALIGNMENT&gt;,
 {
     // check alignment dynamically
     if (src as *const Src as usize) % align_of::&lt;Dst&gt;() != 0 {
@@ -264,8 +280,97 @@ where
 <ol>
 <li>A const generic <code>Neglect</code> parameter is <em>not</em> (yet) defaultable, but this doesn't seem like a permanent limitation of const generics.</li>
 <li>The const generic <code>Neglect</code> admits exactly one encoding of each subset. The value produced by <code>Neglect {alignment: true, validity: true}</code> is identical to the value produced by <code>Neglect {validity: true, alignment: true}</code>.</li>
-<li>The const generic <code>Neglect</code> is generically extendable. Given an existing, arbitrary <code>NEGLECT</code>, we additionally can disable the alignment check with <code>{Neglect { alignment: true, ..NEGLECT }}</code>.</li>
+<li>The const generic <code>Neglect</code> is generically extendable. Given an existing, arbitrary <code>NEGLECT</code>, we additionally can disable the alignment check with <code>{Neglect::ALIGNMENT + NEGLECT}</code>.</li>
 </ol>
+<h1><a class="header" href="#how-should-neglect-values-be-created-combined" id="how-should-neglect-values-be-created-combined">How should <code>Neglect</code> values be created, combined?</a></h1>
+<p>To initialize and combine <code>Neglect</code> values, this proposal defines a set of associated constants and an <code>Add</code> impl:</p>
+<pre><code class="language-rust ignore">impl Neglect {
+    pub const NOTHING: Self = Self {
+        alignment   : false,
+        lifetimes   : false,
+        validity    : false,
+        visibility  : false,
+    };
+
+    pub const ALIGNMENT:  Self = Self {alignment: true, ..Self::NOTHING};
+    pub const LIFETIMES:  Self = Self {lifetimes: true, ..Self::NOTHING};
+    pub const VALIDITY:   Self = Self {validity:  true, ..Self::NOTHING};
+    pub const VISIBILITY: Self = Self {validity:  true, ..Self::NOTHING};
+}
+
+impl const core::ops::Add for Neglect {
+    type Output = Self;
+
+    fn add(self, other: Self) -&gt; Self {
+        Self {
+            alignment   : self.alignment  || other.alignment,
+            lifetimes   : self.lifetimes  || other.lifetimes,
+            validity    : self.validity   || other.validity,
+            visibility  : self.visibility || other.visibility,
+        }
+    }
+}
+</code></pre>
+<p>Consequently, <code>Neglect</code> values can be ergonomically created (e.g., <code>Neglect::ALIGNMENT</code>) and combined (e.g., <code>Neglect::ALIGNMENT + Neglect::VALIDITY + NEGLECT</code>).</p>
+<p>Let's contrast this approach with two other possibilities:</p>
+<h2><a class="header" href="#alternative-minimalism" id="alternative-minimalism">Alternative: Minimalism</a></h2>
+<p>Alternatively, we might only provide:</p>
+<pre><code class="language-rust ignore">impl Neglect {
+    pub const NOTHING: Self = Self {
+        alignment   : false,
+        lifetimes   : false,
+        validity    : false,
+        visibility  : false,
+    };
+}
+</code></pre>
+<p>This is the minimum impl we must provide for <code>Neglect</code> to be useful. With it, <code>Neglect</code> values can be created:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>const NEGLECT_ALIGNMENT: Neglect = {
+  let mut neglect = Neglect::NOTHING;
+  neglect.alignment = true;
+  neglect
+};
+<span class="boring">}
+</span></code></pre></pre>
+<p>and combined:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>const ALSO_NEGLECT_ALIGNMENT_VALIDITY: Neglect = {
+  let mut neglect = NEGLECT;
+  neglect.alignment = true;
+  neglect.validity = true;
+  neglect
+};
+<span class="boring">}
+</span></code></pre></pre>
+<p>This approach achieves minimalism at the cost of ergonomics.</p>
+<h2><a class="header" href="#alternative-builder-methods" id="alternative-builder-methods">Alternative: Builder Methods</a></h2>
+<p>Alternatively, we could define chainable builder methods:</p>
+<pre><code class="language-rust ignore">impl Neglect {
+    pub const NOTHING: Self = Neglect {
+        alignment   : false,
+        lifetimes   : false,
+        validity    : false,
+        visibility  : false,
+    };
+
+    pub const fn alignment(self)  -&gt; Self { Neglect { alignment:  true, ..self } }
+    pub const fn lifetimes(self)  -&gt; Self { Neglect { lifetimes:  true, ..self } }
+    pub const fn validity(self)   -&gt; Self { Neglect { validity:   true, ..self } }
+    pub const fn visibility(self) -&gt; Self { Neglect { visibility: true, ..self } }
+}
+</code></pre>
+<p>With this, <code>Neglect</code> values can be created:</p>
+<pre><code class="language-rust ignore">Neglect::NOTHING.alignment()
+</code></pre>
+<p>...and combined:</p>
+<pre><code class="language-rust ignore">NEGLECT.alignment().validity()
+</code></pre>
+<p>This approach is almost as succinct as the approach selected by this proposal (i.e., the <code>Add</code> impl), but meaning of the resulting expressions are not quite as self-evident.</p>
 <h1><a class="header" href="#spotlight-scope" id="spotlight-scope">Spotlight: Scope</a></h1>
 <ul>
 <li><a href="./scope-safety.html">Why is safety dependent on context?</a></li>
@@ -288,7 +393,7 @@ where
 
     #[repr(C)]
     pub struct NonZeroU32(u32);
-    
+
     impl NonZeroU32 {
         fn new(v: u32) -&gt; Self {
             unsafe { core::mem::transmute(v) } // sound.
@@ -307,6 +412,7 @@ mod b {
 </span></code></pre></pre>
 <p>The transmutation in <code>b</code> is unsound because it constructs a hidden field of <code>NonZeroU32</code>.</p>
 <h1><a class="header" href="#how-does-scope-ensure-safety" id="how-does-scope-ensure-safety">How does <code>Scope</code> ensure safety?</a></h1>
+<p>It's generally unsound to construct instances of types for which you do not have a constructor.</p>
 <p>If <code>BikeshedIntrinsicFrom</code> <em>lacked</em> a <code>Scope</code> parameter; e.g.,:</p>
 <pre><code class="language-rust ignore">// we'll also omit `NEGLECT` for brevity
 pub unsafe trait BikeshedIntrinsicFrom&lt;Src&gt;
@@ -318,27 +424,39 @@ where
 <pre><code class="language-rust ignore">mod a {
     use super::*;
 
-    #[repr(C)]
-    pub struct NonZeroU32(u32);
-    
-    impl NonZeroU32 {
-        fn new(v: u32) -&gt; Self {
-            assert_impl!(NonZeroU32: BikeshedIntrinsicFrom&lt;u32&gt;);
-            unsafe { core::mem::transmute(v) } // sound.
+    mod npc {
+        #[repr(C)]
+        pub struct NoPublicConstructor(u32);
+        
+        impl NoPublicConstructor {
+            pub(super) fn new(v: u32) -&gt; Self {
+                assert!(v % 2 == 0);
+                assert_impl!(NoPublicConstructor: BikeshedIntrinsicFrom&lt;u32&gt;);
+                unsafe { core::mem::transmute(v) } // okay.
+            }
+
+            pub fn method(self) {
+                if self.0 % 2 == 1 {
+                    // totally unreachable, thanks to assert in `Self::new`
+                    unsafe { *std::ptr::null() }
+                }
+            }
         }
     }
+
+    use npc::NoPublicConstructor;
 }
 
 mod b {
     use super::*;
 
-    fn new(v: u32) -&gt; a::NonZeroU32 {
-        assert_not_impl!(NonZeroU32: BikeshedIntrinsicFrom&lt;u32&gt;);
-        unsafe { core::mem::transmute(v) } // ☢️ UNSOUND!
+    fn new(v: u32) -&gt; a::NoPublicConstructor {
+        assert_not_impl!(NoPublicConstructor: BikeshedIntrinsicFrom&lt;u32&gt;);
+        unsafe { core::mem::transmute(v) } // ☢️ BAD!
     }
 }
 </code></pre>
-<p>In module <code>a</code>, <code>NonZeroU32</code> must implement <code>BikeshedIntrinsicFrom&lt;u32&gt;</code>. In module <code>b</code>, it must not. This inconsistency is incompatible with Rust's trait system.</p>
+<p>In module <code>a</code>, <code>NoPublicConstructor</code> must implement <code>BikeshedIntrinsicFrom&lt;u32&gt;</code>. In module <code>b</code>, it must not. This inconsistency is incompatible with Rust's trait system.</p>
 <h2><a class="header" href="#solution" id="solution">Solution</a></h2>
 <p>We resolve this inconsistency by introducing a type parameter, <code>Scope</code>, that allows Rust to distinguish between these two contexts:</p>
 <pre><code class="language-rust ignore">// we omit `NEGLECT` for brevity
@@ -352,29 +470,41 @@ where
 <pre><code class="language-rust ignore">mod a {
     use super::*;
 
-    #[repr(C)]
-    pub struct NonZeroU32(u32);
-    
-    impl NonZeroU32 {
-        fn new(v: u32) -&gt; Self {
-            struct A; // a private type that represents this context
-            assert_impl!(NonZeroU32: BikeshedIntrinsicFrom&lt;u32, A&gt;);
-            unsafe { core::mem::transmute(v) } // sound.
+    mod npc {
+        #[repr(C)]
+        pub struct NoPublicConstructor(u32);
+        
+        impl NoPublicConstructor {
+            pub(super) fn new(v: u32) -&gt; Self {
+                assert!(v % 2 == 0);
+                struct A; // a private type that represents this context
+                assert_impl!(NoPublicConstructor: BikeshedIntrinsicFrom&lt;u32, A&gt;);
+                unsafe { core::mem::transmute(v) } // okay.
+            }
+
+            pub fn method(self) {
+                if self.0 % 2 == 1 {
+                    // totally unreachable, thanks to assert in `Self::new`
+                    unsafe { *std::ptr::null() }
+                }
+            }
         }
     }
+
+    use npc::NoPublicConstructor;
 }
 
 mod b {
     use super::*;
 
-    fn new(v: u32) -&gt; a::NonZeroU32 {
+    fn new(v: u32) -&gt; a::NoPublicConstructor {
         struct B; // a private type that represents this context
-        assert_not_impl!(NonZeroU32: BikeshedIntrinsicFrom&lt;u32, B&gt;);
-        unsafe { core::mem::transmute(v) } // ☢️ UNSOUND!
+        assert_not_impl!(NoPublicConstructor: BikeshedIntrinsicFrom&lt;u32, B&gt;);
+        unsafe { core::mem::transmute(v) } // ☢️ BAD!
     }
 }
 </code></pre>
-<p>In module <code>a</code>, <code>NonZeroU32</code> implements <code>BikeshedIntrinsicFrom&lt;u32, A&gt;</code>. In module <code>b</code>, <code>NonZeroU32</code> does <em>not</em> implement <code>BikeshedIntrinsicFrom&lt;u32, B&gt;</code>. There is no inconsistency.</p>
+<p>In module <code>a</code>, <code>NoPublicConstructor</code> implements <code>BikeshedIntrinsicFrom&lt;u32, A&gt;</code>. In module <code>b</code>, <code>NoPublicConstructor</code> does <em>not</em> implement <code>BikeshedIntrinsicFrom&lt;u32, B&gt;</code>. There is no inconsistency.</p>
 <h1><a class="header" href="#cant-scope-be-elided" id="cant-scope-be-elided">Can't Scope be elided?</a></h1>
 <p><strong>Not generally.</strong></p>
 <p>Consider a hypothetical <code>FromZeros</code> trait that indicates whether <code>Self</code> is safely initializable from a sufficiently large buffer of zero-initialized bytes:</p>
@@ -436,7 +566,11 @@ where
 
         struct Scope;
 
-        const NEGLECT: Neglect = Neglect { $($neglect: true,)* ..Neglect::NOTHING};
+        const NEGLECT: Neglect = {
+            let mut neglect = Neglect::NOTHING;
+            $(neglect . $neglect = true;)*
+            neglect
+        };
 
         transmute::&lt;_, _, Scope, NEGLECT&gt;($src)
     }};
@@ -449,13 +583,13 @@ where
 </code></pre>
 <p>Swapping <code>mem::transmute</code> out for our macro (rightfully) produces a compile error:</p>
 <pre><code class="language-rust ignore">unsafe fn foo(v: u8) -&gt; bool {
-    transmute!(v) // Compile Error!
+    unsafe { transmute!(v) } // Compile Error!
 }
 </code></pre>
 <p>...that we may resolve by explicitly neglecting validity:</p>
 <pre><code class="language-rust ignore">fn foo(v: u8) -&gt; bool {
     assert!(v &lt; 2);
-    transmute!(v, Neglect { validity })
+    unsafe { transmute!(v, Neglect { validity }) }
 }
 </code></pre>
 <h1><a class="header" href="#use-case-abstraction" id="use-case-abstraction">Use-Case: Abstraction</a></h1>
@@ -475,13 +609,11 @@ pub unsafe trait MuckFrom&lt;Src&gt;
         Self: Sized;
 }
 
-const NEGLECT_VIS: Neglect = Neglect{visibility: true, ..Neglect::NOTHING};
-
 unsafe impl&lt;Src, Dst&gt; MuckFrom&lt;Src&gt; for Dst
 where
     Src: Muckable,
     Dst: Muckable,
-    Dst: BikeshedIntrinsicFrom&lt;Src, !, {NEGLECT_VIS}&gt;
+    Dst: BikeshedIntrinsicFrom&lt;Src, !, {Neglect::VISIBILITY}&gt;
 {
     fn muck_from(src: Src) -&gt; Self
     where
@@ -631,7 +763,7 @@ mod downstream {
         use core::{slice, mem::size_of};
         
         unsafe {
-            slice::from_raw_parts(t as *const T, size_of::&lt;T&gt;())
+            slice::from_raw_parts(t as *const T as *const u8, size_of::&lt;T&gt;())
         }
     }
 }

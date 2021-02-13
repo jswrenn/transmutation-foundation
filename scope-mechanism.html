@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="neglect.html"><strong aria-hidden="true">1.</strong> Spotlight: Neglect</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="neglect-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Neglect?</a></li><li class="chapter-item expanded "><a href="neglect-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Neglect a const parameter?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html" class="active"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="neglect.html"><strong aria-hidden="true">1.</strong> Spotlight: Neglect</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="neglect-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Neglect?</a></li><li class="chapter-item expanded "><a href="neglect-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Neglect a const parameter?</a></li><li class="chapter-item expanded "><a href="neglect-combining.html"><strong aria-hidden="true">1.3.</strong> How should Neglects be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html" class="active"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -164,6 +164,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#how-does-scope-ensure-safety" id="how-does-scope-ensure-safety">How does <code>Scope</code> ensure safety?</a></h1>
+<p>It's generally unsound to construct instances of types for which you do not have a constructor.</p>
 <p>If <code>BikeshedIntrinsicFrom</code> <em>lacked</em> a <code>Scope</code> parameter; e.g.,:</p>
 <pre><code class="language-rust ignore">// we'll also omit `NEGLECT` for brevity
 pub unsafe trait BikeshedIntrinsicFrom&lt;Src&gt;
@@ -175,27 +176,39 @@ where
 <pre><code class="language-rust ignore">mod a {
     use super::*;
 
-    #[repr(C)]
-    pub struct NonZeroU32(u32);
-    
-    impl NonZeroU32 {
-        fn new(v: u32) -&gt; Self {
-            assert_impl!(NonZeroU32: BikeshedIntrinsicFrom&lt;u32&gt;);
-            unsafe { core::mem::transmute(v) } // sound.
+    mod npc {
+        #[repr(C)]
+        pub struct NoPublicConstructor(u32);
+        
+        impl NoPublicConstructor {
+            pub(super) fn new(v: u32) -&gt; Self {
+                assert!(v % 2 == 0);
+                assert_impl!(NoPublicConstructor: BikeshedIntrinsicFrom&lt;u32&gt;);
+                unsafe { core::mem::transmute(v) } // okay.
+            }
+
+            pub fn method(self) {
+                if self.0 % 2 == 1 {
+                    // totally unreachable, thanks to assert in `Self::new`
+                    unsafe { *std::ptr::null() }
+                }
+            }
         }
     }
+
+    use npc::NoPublicConstructor;
 }
 
 mod b {
     use super::*;
 
-    fn new(v: u32) -&gt; a::NonZeroU32 {
-        assert_not_impl!(NonZeroU32: BikeshedIntrinsicFrom&lt;u32&gt;);
-        unsafe { core::mem::transmute(v) } // ☢️ UNSOUND!
+    fn new(v: u32) -&gt; a::NoPublicConstructor {
+        assert_not_impl!(NoPublicConstructor: BikeshedIntrinsicFrom&lt;u32&gt;);
+        unsafe { core::mem::transmute(v) } // ☢️ BAD!
     }
 }
 </code></pre>
-<p>In module <code>a</code>, <code>NonZeroU32</code> must implement <code>BikeshedIntrinsicFrom&lt;u32&gt;</code>. In module <code>b</code>, it must not. This inconsistency is incompatible with Rust's trait system.</p>
+<p>In module <code>a</code>, <code>NoPublicConstructor</code> must implement <code>BikeshedIntrinsicFrom&lt;u32&gt;</code>. In module <code>b</code>, it must not. This inconsistency is incompatible with Rust's trait system.</p>
 <h2><a class="header" href="#solution" id="solution">Solution</a></h2>
 <p>We resolve this inconsistency by introducing a type parameter, <code>Scope</code>, that allows Rust to distinguish between these two contexts:</p>
 <pre><code class="language-rust ignore">// we omit `NEGLECT` for brevity
@@ -209,29 +222,41 @@ where
 <pre><code class="language-rust ignore">mod a {
     use super::*;
 
-    #[repr(C)]
-    pub struct NonZeroU32(u32);
-    
-    impl NonZeroU32 {
-        fn new(v: u32) -&gt; Self {
-            struct A; // a private type that represents this context
-            assert_impl!(NonZeroU32: BikeshedIntrinsicFrom&lt;u32, A&gt;);
-            unsafe { core::mem::transmute(v) } // sound.
+    mod npc {
+        #[repr(C)]
+        pub struct NoPublicConstructor(u32);
+        
+        impl NoPublicConstructor {
+            pub(super) fn new(v: u32) -&gt; Self {
+                assert!(v % 2 == 0);
+                struct A; // a private type that represents this context
+                assert_impl!(NoPublicConstructor: BikeshedIntrinsicFrom&lt;u32, A&gt;);
+                unsafe { core::mem::transmute(v) } // okay.
+            }
+
+            pub fn method(self) {
+                if self.0 % 2 == 1 {
+                    // totally unreachable, thanks to assert in `Self::new`
+                    unsafe { *std::ptr::null() }
+                }
+            }
         }
     }
+
+    use npc::NoPublicConstructor;
 }
 
 mod b {
     use super::*;
 
-    fn new(v: u32) -&gt; a::NonZeroU32 {
+    fn new(v: u32) -&gt; a::NoPublicConstructor {
         struct B; // a private type that represents this context
-        assert_not_impl!(NonZeroU32: BikeshedIntrinsicFrom&lt;u32, B&gt;);
-        unsafe { core::mem::transmute(v) } // ☢️ UNSOUND!
+        assert_not_impl!(NoPublicConstructor: BikeshedIntrinsicFrom&lt;u32, B&gt;);
+        unsafe { core::mem::transmute(v) } // ☢️ BAD!
     }
 }
 </code></pre>
-<p>In module <code>a</code>, <code>NonZeroU32</code> implements <code>BikeshedIntrinsicFrom&lt;u32, A&gt;</code>. In module <code>b</code>, <code>NonZeroU32</code> does <em>not</em> implement <code>BikeshedIntrinsicFrom&lt;u32, B&gt;</code>. There is no inconsistency.</p>
+<p>In module <code>a</code>, <code>NoPublicConstructor</code> implements <code>BikeshedIntrinsicFrom&lt;u32, A&gt;</code>. In module <code>b</code>, <code>NoPublicConstructor</code> does <em>not</em> implement <code>BikeshedIntrinsicFrom&lt;u32, B&gt;</code>. There is no inconsistency.</p>
 
                     </main>
 

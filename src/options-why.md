@@ -1,7 +1,7 @@
 # Why do we need Assume?
 The ability to omit particular static checks makes `BikeshedIntrinsicFrom` useful in scenarios where aspects of well-definedness and safety are ensured through other means.
 
-## Example: Assumeing Alignment
+## Example: Assuming Alignment
 For the instantiation of a `&'dst Dst` from any `&'src Src` to be safe, the minimum required alignment of all `Src` must be stricter than the minimum required alignment of `Dst`, among other factors (e.g., `'src` must outlive `'dst`). By default, `BikeshedIntrinsicFrom` will enforce these requirements statically.
 
 However, for the instantiation of a `&'dst Dst` from a *particular* `&'src Src` to be safe, we can just check that the alignment of that *particular* `&'src Src` is sufficient using `mem::align_of` (e.g., see bytemuck's [try_cast_ref](https://docs.rs/bytemuck/1.4.1/bytemuck/fn.try_cast_ref.html) method).

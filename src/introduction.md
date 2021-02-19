@@ -32,7 +32,7 @@ The `Assume` parameter encodes the set of static checks that the compiler should
 - validity
 - visibility
 
-Assumeing *any* static checks disqualifies a transmutation from being safe. The `Assume` type is represented like this:
+The `Assume` type is represented like this:
 ```rust,ignore
 #[derive(PartialEq, Eq)]
 #[non_exhaustive]

@@ -1,8 +1,8 @@
-# How should `Neglect` values be created, combined?
+# How should `Assume` values be created, combined?
 
-To initialize and combine `Neglect` values, this proposal defines a set of associated constants and an `Add` impl:
+To initialize and combine `Assume` values, this proposal defines a set of associated constants and an `Add` impl:
 ```rust,ignore
-impl Neglect {
+impl Assume {
     pub const NOTHING: Self = Self {
         alignment   : false,
         lifetimes   : false,
@@ -16,7 +16,7 @@ impl Neglect {
     pub const VISIBILITY: Self = Self {validity:  true, ..Self::NOTHING};
 }
 
-impl const core::ops::Add for Neglect {
+impl const core::ops::Add for Assume {
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
@@ -30,14 +30,14 @@ impl const core::ops::Add for Neglect {
 }
 ```
 
-Consequently, `Neglect` values can be ergonomically created (e.g., `Neglect::ALIGNMENT`) and combined (e.g., `Neglect::ALIGNMENT + Neglect::VALIDITY + NEGLECT`).
+Consequently, `Assume` values can be ergonomically created (e.g., `Assume::ALIGNMENT`) and combined (e.g., `Assume::ALIGNMENT + Assume::VALIDITY + ASSUME`).
 
 Let's contrast this approach with two other possibilities:
 
 ## Alternative: Minimalism
 Alternatively, we might only provide:
 ```rust,ignore
-impl Neglect {
+impl Assume {
     pub const NOTHING: Self = Self {
         alignment   : false,
         lifetimes   : false,
@@ -46,21 +46,21 @@ impl Neglect {
     };
 }
 ```
-This is the minimum impl we must provide for `Neglect` to be useful. With it, `Neglect` values can be created:
+This is the minimum impl we must provide for `Assume` to be useful. With it, `Assume` values can be created:
 ```rust
-const NEGLECT_ALIGNMENT: Neglect = {
-  let mut neglect = Neglect::NOTHING;
-  neglect.alignment = true;
-  neglect
+const ASSUME_ALIGNMENT: Assume = {
+  let mut assume = Assume::NOTHING;
+  assume.alignment = true;
+  assume
 };
 ```
 and combined:
 ```rust
-const ALSO_NEGLECT_ALIGNMENT_VALIDITY: Neglect = {
-  let mut neglect = NEGLECT;
-  neglect.alignment = true;
-  neglect.validity = true;
-  neglect
+const ALSO_ASSUME_ALIGNMENT_VALIDITY: Assume = {
+  let mut assume = ASSUME;
+  assume.alignment = true;
+  assume.validity = true;
+  assume
 };
 ```
 
@@ -69,27 +69,27 @@ This approach achieves minimalism at the cost of ergonomics.
 ## Alternative: Builder Methods
 Alternatively, we could define chainable builder methods:
 ```rust,ignore
-impl Neglect {
-    pub const NOTHING: Self = Neglect {
+impl Assume {
+    pub const NOTHING: Self = Assume {
         alignment   : false,
         lifetimes   : false,
         validity    : false,
         visibility  : false,
     };
 
-    pub const fn alignment(self)  -> Self { Neglect { alignment:  true, ..self } }
-    pub const fn lifetimes(self)  -> Self { Neglect { lifetimes:  true, ..self } }
-    pub const fn validity(self)   -> Self { Neglect { validity:   true, ..self } }
-    pub const fn visibility(self) -> Self { Neglect { visibility: true, ..self } }
+    pub const fn alignment(self)  -> Self { Assume { alignment:  true, ..self } }
+    pub const fn lifetimes(self)  -> Self { Assume { lifetimes:  true, ..self } }
+    pub const fn validity(self)   -> Self { Assume { validity:   true, ..self } }
+    pub const fn visibility(self) -> Self { Assume { visibility: true, ..self } }
 }
 ```
-With this, `Neglect` values can be created:
+With this, `Assume` values can be created:
 ```rust,ignore
-Neglect::NOTHING.alignment()
+Assume::NOTHING.alignment()
 ```
 ...and combined:
 ```rust,ignore
-NEGLECT.alignment().validity()
+ASSUME.alignment().validity()
 ```
 
 This approach is almost as succinct as the approach selected by this proposal (i.e., the `Add` impl), but meaning of the resulting expressions are not quite as self-evident.

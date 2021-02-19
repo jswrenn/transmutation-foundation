@@ -4,7 +4,7 @@ It's generally unsound to construct instances of types for which you do not have
 
 If `BikeshedIntrinsicFrom` *lacked* a `Scope` parameter; e.g.,:
 ```rust,ignore
-// we'll also omit `NEGLECT` for brevity
+// we'll also omit `ASSUME` for brevity
 pub unsafe trait BikeshedIntrinsicFrom<Src>
 where
     Src: ?Sized
@@ -53,7 +53,7 @@ In module `a`, `NoPublicConstructor` must implement `BikeshedIntrinsicFrom<u32>`
 
 We resolve this inconsistency by introducing a type parameter, `Scope`, that allows Rust to distinguish between these two contexts:
 ```rust,ignore
-// we omit `NEGLECT` for brevity
+// we omit `ASSUME` for brevity
 pub unsafe trait BikeshedIntrinsicFrom<Src, Scope>
 where
     Src: ?Sized

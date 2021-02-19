@@ -3,9 +3,9 @@
 Many use-cases of `BikeshedIntrinsicFrom` involve using something like this `BikeshedIntrinsicFrom`-bounded function:
 ```rust,ignore
 #[inline(always)]
-unsafe fn transmute<Src, Dst, Scope, const NEGLECT: Neglect>(src: Src) -> Dst
+unsafe fn transmute<Src, Dst, Scope, const ASSUME: Assume>(src: Src) -> Dst
 where
-    Dst: BikeshedIntrinsicFrom<Src, Scope, NEGLECT>
+    Dst: BikeshedIntrinsicFrom<Src, Scope, ASSUME>
 {
 
     #[repr(C)]
@@ -23,10 +23,10 @@ That function, as defined, cannot be added to the root of `mem`, because it woul
 
 We could resolve this conflict by:
 1. using a [name](./unresolved-trait-name.md) other than "transmute" for this proposal.
-2. placing `BikeshedIntrinsicFrom`, `Neglect`, and this function under a new module (e.g., `mem::cast`)
+2. placing `BikeshedIntrinsicFrom`, `Assume`, and this function under a new module (e.g., `mem::cast`)
 3. defining an associated function on `BikeshedIntrinsicFrom`; e.g.:   
     ```rust,ignore
-    pub unsafe trait BikeshedIntrinsicFrom<Src, Scope, const NEGLECT: Neglect>
+    pub unsafe trait BikeshedIntrinsicFrom<Src, Scope, const ASSUME: Assume>
     where
         Src: ?Sized
     {

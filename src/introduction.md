@@ -2,13 +2,13 @@
 
 We propose that this *compiler-intrinsic* trait (end-users *cannot* implement it) be added to `core::mem`:
 ```rust,ignore
-pub unsafe trait BikeshedIntrinsicFrom<Src, Scope, const NEGLECT: Neglect>
+pub unsafe trait BikeshedIntrinsicFrom<Src, Scope, const ASSUME: Assume>
 where
     Src: ?Sized
 {}
 ```
 
-This trait is capable of telling you whether a particular bit-reinterpretation cast from `Src` to `Self` is well-defined and safe (notwithstanding whatever static checks you decide to `Neglect`).
+This trait is capable of telling you whether a particular bit-reinterpretation cast from `Src` to `Self` is well-defined and safe (notwithstanding whatever static checks you decide to `Assume`).
 
 This trait is useful:
 1. [for auditing the safety of existing code](./use-case-auditing.md)
@@ -25,25 +25,25 @@ In order to be **safe**, a well-defined transmutation must also not allow you to
 
 Whether these conditions are satisfied depends on the scope the transmutation occurs in. The existing mechanism of [type privacy](https://rust-lang.github.io/rfcs/2145-type-privacy.html) will ensure that first condition is satisfied. To enforce the second and third conditions, we introduce the `Scope` type parameter (see below). 
 
-## What is `Neglect`?
-The `Neglect` parameter encodes the set of static checks that the compiler should ignore when determining transmutability. These checks include:
+## What is `Assume`?
+The `Assume` parameter encodes the set of static checks that the compiler should ignore when determining transmutability. These checks include:
 - alignment
 - lifetimes
 - validity
 - visibility
 
-Neglecting *any* static checks disqualifies a transmutation from being safe. The `Neglect` type is represented like this:
+Assumeing *any* static checks disqualifies a transmutation from being safe. The `Assume` type is represented like this:
 ```rust,ignore
 #[derive(PartialEq, Eq)]
 #[non_exhaustive]
-pub struct Neglect {
+pub struct Assume {
     pub alignment   : bool,
     pub lifetimes   : bool,
     pub validity    : bool,
     pub visibility  : bool,
 }
 
-impl Neglect {
+impl Assume {
     pub const NOTHING: Self = Self {
         alignment   : false,
         lifetimes   : false,
@@ -57,7 +57,7 @@ impl Neglect {
     pub const VISIBILITY: Self = Self {validity:  true, ..Self::NOTHING};
 }
 
-impl const core::ops::Add for Neglect {
+impl const core::ops::Add for Assume {
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
@@ -71,13 +71,13 @@ impl const core::ops::Add for Neglect {
 }
 ```
 
-**For more information, see [here](neglect.md).**
+**For more information, see [here](options.md).**
 
 ## What is `Scope`?
 The `Scope` parameter of `BikeshedIntrinsicFrom` is used to ensure that the second and third safety conditions are satisfied.
 
 When visibility is enforced, `Scope` must be instantiated with any private (i.e., `pub(self)` type. The compiler pretends that it is at the defining scope of that type, and checks that the necessary fields of `Src` and `Dst` are visible.
 
-When visibility is neglected, the `Scope` parameter is ignored.
+When visibility is assumed, the `Scope` parameter is ignored.
 
 **For more information, see [here](scope.md).**

@@ -1,10 +1,10 @@
 # Summary
 
 [Overview](./introduction.md)
-- [Spotlight: `Neglect`](./neglect.md)
-  - [Why do we need `Neglect`?](./neglect-why.md)
-  - [Why is `Neglect` a `const` parameter?](./neglect-encoding.md)
-  - [How should `Neglect`s be created, combined?](./neglect-combining.md)
+- [Spotlight: `Assume`](./options.md)
+  - [Why do we need `Assume`?](./options-why.md)
+  - [Why is `Assume` a `const` parameter?](./options-encoding.md)
+  - [How should `Assume`s be created, combined?](./options-combining.md)
 - [Spotlight: `Scope`](./scope.md)
   - [Why is safety dependent on context?](./scope-safety.md)
   - [How does `Scope` ensure safety?](./scope-mechanism.md)

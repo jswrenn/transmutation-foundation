@@ -22,7 +22,7 @@ unsafe impl<Src, Dst> MuckFrom<Src> for Dst
 where
     Src: Muckable,
     Dst: Muckable,
-    Dst: BikeshedIntrinsicFrom<Src, !, {Neglect::VISIBILITY}>
+    Dst: BikeshedIntrinsicFrom<Src, !, {Assume::VISIBILITY}>
 {
     fn muck_from(src: Src) -> Self
     where

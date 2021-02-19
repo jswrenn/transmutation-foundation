@@ -3,12 +3,12 @@
 `BikeshedIntrinsicFrom` can be used to audit the soundness of existing transmutations in code-bases. This macro demonstrates a drop-in replacement to `mem::transmute` that produces a compile error if the transmutation is unsound:
 ```rust,ignored
 macro_rules! transmute {
-    ($src:expr) => {transmute!($src, Neglect {})};
-    ($src:expr, Neglect { $( $neglect:ident ),* } ) => {{
+    ($src:expr) => {transmute!($src, Assume {})};
+    ($src:expr, Assume { $( $assume:ident ),* } ) => {{
         #[inline(always)]
-        unsafe fn transmute<Src, Dst, Scope, const NEGLECT: Neglect>(src: Src) -> Dst
+        unsafe fn transmute<Src, Dst, Scope, const ASSUME: Assume>(src: Src) -> Dst
         where
-            Dst: BikeshedIntrinsicFrom<Src, Scope, NEGLECT>
+            Dst: BikeshedIntrinsicFrom<Src, Scope, ASSUME>
         {
             #[repr(C)]
             union Transmute<Src, Dst> {
@@ -21,13 +21,13 @@ macro_rules! transmute {
 
         struct Scope;
 
-        const NEGLECT: Neglect = {
-            let mut neglect = Neglect::NOTHING;
-            $(neglect . $neglect = true;)*
-            neglect
+        const ASSUME: Assume = {
+            let mut assume = Assume::NOTHING;
+            $(assume . $assume = true;)*
+            assume
         };
 
-        transmute::<_, _, Scope, NEGLECT>($src)
+        transmute::<_, _, Scope, ASSUME>($src)
     }};
 }
 ```
@@ -44,11 +44,11 @@ unsafe fn foo(v: u8) -> bool {
     unsafe { transmute!(v) } // Compile Error!
 }
 ```
-...that we may resolve by explicitly neglecting validity:
+...that we may resolve by explicitly instructing the compiler to assume validity:
 ```rust,ignore
 fn foo(v: u8) -> bool {
     assert!(v < 2);
-    unsafe { transmute!(v, Neglect { validity }) }
+    unsafe { transmute!(v, Assume { validity }) }
 }
 ```
 

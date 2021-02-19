@@ -5,7 +5,7 @@ Should it be `BikeshedIntrinsicFrom` or `BikeshedIntrinsicInto`? What factors sh
 
 ## `From`
 ```rust,ignore
-pub unsafe trait BikeshedIntrinsicFrom<Src, Scope, const NEGLECT: Neglect>
+pub unsafe trait BikeshedIntrinsicFrom<Src, Scope, const ASSUME: Assume>
 where
     Src: ?Sized
 {
@@ -27,7 +27,7 @@ where
 
 ## `Into`
 ```rust,ignore
-pub unsafe trait BikeshedIntrinsicInto<Dst, Scope, const NEGLECT: Neglect>
+pub unsafe trait BikeshedIntrinsicInto<Dst, Scope, const ASSUME: Assume>
 where
     Dst: ?Sized
 {

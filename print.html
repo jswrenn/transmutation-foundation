@@ -97,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="neglect.html"><strong aria-hidden="true">1.</strong> Spotlight: Neglect</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="neglect-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Neglect?</a></li><li class="chapter-item expanded "><a href="neglect-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Neglect a const parameter?</a></li><li class="chapter-item expanded "><a href="neglect-combining.html"><strong aria-hidden="true">1.3.</strong> How should Neglects be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="options.html"><strong aria-hidden="true">1.</strong> Spotlight: Assume</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="options-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Assume?</a></li><li class="chapter-item expanded "><a href="options-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Assume a const parameter?</a></li><li class="chapter-item expanded "><a href="options-combining.html"><strong aria-hidden="true">1.3.</strong> How should Assumes be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -167,12 +167,12 @@
                     <main>
                         <h1><a class="header" href="#overview" id="overview">Overview</a></h1>
 <p>We propose that this <em>compiler-intrinsic</em> trait (end-users <em>cannot</em> implement it) be added to <code>core::mem</code>:</p>
-<pre><code class="language-rust ignore">pub unsafe trait BikeshedIntrinsicFrom&lt;Src, Scope, const NEGLECT: Neglect&gt;
+<pre><code class="language-rust ignore">pub unsafe trait BikeshedIntrinsicFrom&lt;Src, Scope, const ASSUME: Assume&gt;
 where
     Src: ?Sized
 {}
 </code></pre>
-<p>This trait is capable of telling you whether a particular bit-reinterpretation cast from <code>Src</code> to <code>Self</code> is well-defined and safe (notwithstanding whatever static checks you decide to <code>Neglect</code>).</p>
+<p>This trait is capable of telling you whether a particular bit-reinterpretation cast from <code>Src</code> to <code>Self</code> is well-defined and safe (notwithstanding whatever static checks you decide to <code>Assume</code>).</p>
 <p>This trait is useful:</p>
 <ol>
 <li><a href="./use-case-auditing.html">for auditing the safety of existing code</a></li>
@@ -187,25 +187,25 @@ where
 <li>construct hidden fields of the <code>Dst</code> type</li>
 </ol>
 <p>Whether these conditions are satisfied depends on the scope the transmutation occurs in. The existing mechanism of <a href="https://rust-lang.github.io/rfcs/2145-type-privacy.html">type privacy</a> will ensure that first condition is satisfied. To enforce the second and third conditions, we introduce the <code>Scope</code> type parameter (see below). </p>
-<h2><a class="header" href="#what-is-neglect" id="what-is-neglect">What is <code>Neglect</code>?</a></h2>
-<p>The <code>Neglect</code> parameter encodes the set of static checks that the compiler should ignore when determining transmutability. These checks include:</p>
+<h2><a class="header" href="#what-is-assume" id="what-is-assume">What is <code>Assume</code>?</a></h2>
+<p>The <code>Assume</code> parameter encodes the set of static checks that the compiler should ignore when determining transmutability. These checks include:</p>
 <ul>
 <li>alignment</li>
 <li>lifetimes</li>
 <li>validity</li>
 <li>visibility</li>
 </ul>
-<p>Neglecting <em>any</em> static checks disqualifies a transmutation from being safe. The <code>Neglect</code> type is represented like this:</p>
+<p>Assumeing <em>any</em> static checks disqualifies a transmutation from being safe. The <code>Assume</code> type is represented like this:</p>
 <pre><code class="language-rust ignore">#[derive(PartialEq, Eq)]
 #[non_exhaustive]
-pub struct Neglect {
+pub struct Assume {
     pub alignment   : bool,
     pub lifetimes   : bool,
     pub validity    : bool,
     pub visibility  : bool,
 }
 
-impl Neglect {
+impl Assume {
     pub const NOTHING: Self = Self {
         alignment   : false,
         lifetimes   : false,
@@ -219,7 +219,7 @@ impl Neglect {
     pub const VISIBILITY: Self = Self {validity:  true, ..Self::NOTHING};
 }
 
-impl const core::ops::Add for Neglect {
+impl const core::ops::Add for Assume {
     type Output = Self;
 
     fn add(self, other: Self) -&gt; Self {
@@ -232,31 +232,31 @@ impl const core::ops::Add for Neglect {
     }
 }
 </code></pre>
-<p><strong>For more information, see <a href="neglect.html">here</a>.</strong></p>
+<p><strong>For more information, see <a href="options.html">here</a>.</strong></p>
 <h2><a class="header" href="#what-is-scope" id="what-is-scope">What is <code>Scope</code>?</a></h2>
 <p>The <code>Scope</code> parameter of <code>BikeshedIntrinsicFrom</code> is used to ensure that the second and third safety conditions are satisfied.</p>
 <p>When visibility is enforced, <code>Scope</code> must be instantiated with any private (i.e., <code>pub(self)</code> type. The compiler pretends that it is at the defining scope of that type, and checks that the necessary fields of <code>Src</code> and <code>Dst</code> are visible.</p>
-<p>When visibility is neglected, the <code>Scope</code> parameter is ignored.</p>
+<p>When visibility is assumed, the <code>Scope</code> parameter is ignored.</p>
 <p><strong>For more information, see <a href="scope.html">here</a>.</strong></p>
-<h1><a class="header" href="#spotlight-on-neglect" id="spotlight-on-neglect">Spotlight on <code>Neglect</code></a></h1>
+<h1><a class="header" href="#spotlight-on-assume" id="spotlight-on-assume">Spotlight on <code>Assume</code></a></h1>
 <ul>
-<li><a href="./neglect-why.html">Why do we need <code>Neglect</code>?</a></li>
-<li><a href="./neglect-encoding.html">Why is <code>Neglect</code> a <code>const</code> parameter?</a></li>
-<li><a href="./neglect-combining.html">How should <code>Neglect</code> values be created, combined?</a></li>
+<li><a href="./options-why.html">Why do we need <code>Assume</code>?</a></li>
+<li><a href="./options-encoding.html">Why is <code>Assume</code> a <code>const</code> parameter?</a></li>
+<li><a href="./options-combining.html">How should <code>Assume</code> values be created, combined?</a></li>
 </ul>
-<h1><a class="header" href="#why-do-we-need-neglect" id="why-do-we-need-neglect">Why do we need Neglect?</a></h1>
-<p>The ability to neglect particular static checks makes <code>BikeshedIntrinsicFrom</code> useful in scenarios where aspects of well-definedness and safety are ensured through other means.</p>
-<h2><a class="header" href="#example-neglecting-alignment" id="example-neglecting-alignment">Example: Neglecting Alignment</a></h2>
+<h1><a class="header" href="#why-do-we-need-assume" id="why-do-we-need-assume">Why do we need Assume?</a></h1>
+<p>The ability to omit particular static checks makes <code>BikeshedIntrinsicFrom</code> useful in scenarios where aspects of well-definedness and safety are ensured through other means.</p>
+<h2><a class="header" href="#example-assumeing-alignment" id="example-assumeing-alignment">Example: Assumeing Alignment</a></h2>
 <p>For the instantiation of a <code>&amp;'dst Dst</code> from any <code>&amp;'src Src</code> to be safe, the minimum required alignment of all <code>Src</code> must be stricter than the minimum required alignment of <code>Dst</code>, among other factors (e.g., <code>'src</code> must outlive <code>'dst</code>). By default, <code>BikeshedIntrinsicFrom</code> will enforce these requirements statically.</p>
 <p>However, for the instantiation of a <code>&amp;'dst Dst</code> from a <em>particular</em> <code>&amp;'src Src</code> to be safe, we can just check that the alignment of that <em>particular</em> <code>&amp;'src Src</code> is sufficient using <code>mem::align_of</code> (e.g., see bytemuck's <a href="https://docs.rs/bytemuck/1.4.1/bytemuck/fn.try_cast_ref.html">try_cast_ref</a> method).</p>
-<p>Using a <code>NEGLECT</code> parameter of <code>Neglect::ALIGNMENT</code> makes <code>BikeshedIntrinsicFrom</code> useful in this scenario. With that <code>NEGLECT</code> parameter, <code>BikeshedIntrinsicFrom</code> neglects only its static alignment check, which we then assume responsibility to enforce ourselves; e.g.:</p>
+<p>Using a <code>ASSUME</code> parameter of <code>Assume::ALIGNMENT</code> makes <code>BikeshedIntrinsicFrom</code> useful in this scenario. With that <code>ASSUME</code> parameter, <code>BikeshedIntrinsicFrom</code> omits only its static alignment check, which we then assume responsibility to enforce ourselves; e.g.:</p>
 <pre><code class="language-rust ignore">/// Try to convert a `&amp;'src Src` into `&amp;'dst Dst`.
 ///
 /// This produces `None` if the referent isn't appropriately
 /// aligned, as required by the destination type.
 fn try_cast_ref&lt;'src, 'dst, Src, Dst, Scope&gt;(src: &amp;'src Src) -&gt; Option&lt;&amp;'dst Dst&gt;
 where
-    &amp;'t T: BikeshedIntrinsicFrom&lt;&amp;'dst Dst, Scope, Neglect::ALIGNMENT&gt;,
+    &amp;'t T: BikeshedIntrinsicFrom&lt;&amp;'dst Dst, Scope, Assume::ALIGNMENT&gt;,
 {
     // check alignment dynamically
     if (src as *const Src as usize) % align_of::&lt;Dst&gt;() != 0 {
@@ -268,23 +268,23 @@ where
     }
 }
 </code></pre>
-<h1><a class="header" href="#why-is-neglect-a-const-parameter" id="why-is-neglect-a-const-parameter">Why is Neglect a const parameter?</a></h1>
-<p>We've considered <a href="https://hackmd.io/@jswrenn/S192QCR9D">a few different ways</a> in which <code>Neglect</code> might be represented. An ideal representation has three properties:</p>
+<h1><a class="header" href="#why-is-assume-a-const-parameter" id="why-is-assume-a-const-parameter">Why is Assume a const parameter?</a></h1>
+<p>We've considered <a href="https://hackmd.io/@jswrenn/S192QCR9D">a few different ways</a> in which <code>Assume</code> might be represented. An ideal representation has three properties:</p>
 <ol>
-<li>is defaultable with &quot;neglect nothing&quot;, so doing the totally safe thing is truly the easiest thing</li>
-<li>every subset of neglected options has exactly <em>one</em> encoding (i.e., neglecting validity and alignment is the same as neglecting alignment and validity)</li>
-<li>is generically adjustable (i.e., I can add or remove a neglect from an existing set of options)</li>
+<li>is defaultable with &quot;assume nothing&quot;, so doing the totally safe thing is truly the easiest thing</li>
+<li>every subset of assumptions has exactly <em>one</em> encoding (i.e., assuming validity and alignment is the same as assuming alignment and validity)</li>
+<li>is generically adjustable (i.e., I can add or remove an assumption from an existing set of options)</li>
 </ol>
 <p>The type parameter approaches we've considered tick both the first box, and <em>either</em> the second xor third. The sorts of type system extensions that would permit ticking all three of these boxes with a type parameter are far off.</p>
 <p>In contrast:</p>
 <ol>
-<li>A const generic <code>Neglect</code> parameter is <em>not</em> (yet) defaultable, but this doesn't seem like a permanent limitation of const generics.</li>
-<li>The const generic <code>Neglect</code> admits exactly one encoding of each subset. The value produced by <code>Neglect {alignment: true, validity: true}</code> is identical to the value produced by <code>Neglect {validity: true, alignment: true}</code>.</li>
-<li>The const generic <code>Neglect</code> is generically extendable. Given an existing, arbitrary <code>NEGLECT</code>, we additionally can disable the alignment check with <code>{Neglect::ALIGNMENT + NEGLECT}</code>.</li>
+<li>A const generic <code>Assume</code> parameter is <em>not</em> (yet) defaultable, but this doesn't seem like a permanent limitation of const generics.</li>
+<li>The const generic <code>Assume</code> admits exactly one encoding of each subset. The value produced by <code>Assume {alignment: true, validity: true}</code> is identical to the value produced by <code>Assume {validity: true, alignment: true}</code>.</li>
+<li>The const generic <code>Assume</code> is generically extendable. Given an existing, arbitrary <code>ASSUME</code>, we additionally can disable the alignment check with <code>{Assume::ALIGNMENT + ASSUME}</code>.</li>
 </ol>
-<h1><a class="header" href="#how-should-neglect-values-be-created-combined" id="how-should-neglect-values-be-created-combined">How should <code>Neglect</code> values be created, combined?</a></h1>
-<p>To initialize and combine <code>Neglect</code> values, this proposal defines a set of associated constants and an <code>Add</code> impl:</p>
-<pre><code class="language-rust ignore">impl Neglect {
+<h1><a class="header" href="#how-should-assume-values-be-created-combined" id="how-should-assume-values-be-created-combined">How should <code>Assume</code> values be created, combined?</a></h1>
+<p>To initialize and combine <code>Assume</code> values, this proposal defines a set of associated constants and an <code>Add</code> impl:</p>
+<pre><code class="language-rust ignore">impl Assume {
     pub const NOTHING: Self = Self {
         alignment   : false,
         lifetimes   : false,
@@ -298,7 +298,7 @@ where
     pub const VISIBILITY: Self = Self {validity:  true, ..Self::NOTHING};
 }
 
-impl const core::ops::Add for Neglect {
+impl const core::ops::Add for Assume {
     type Output = Self;
 
     fn add(self, other: Self) -&gt; Self {
@@ -311,11 +311,11 @@ impl const core::ops::Add for Neglect {
     }
 }
 </code></pre>
-<p>Consequently, <code>Neglect</code> values can be ergonomically created (e.g., <code>Neglect::ALIGNMENT</code>) and combined (e.g., <code>Neglect::ALIGNMENT + Neglect::VALIDITY + NEGLECT</code>).</p>
+<p>Consequently, <code>Assume</code> values can be ergonomically created (e.g., <code>Assume::ALIGNMENT</code>) and combined (e.g., <code>Assume::ALIGNMENT + Assume::VALIDITY + ASSUME</code>).</p>
 <p>Let's contrast this approach with two other possibilities:</p>
 <h2><a class="header" href="#alternative-minimalism" id="alternative-minimalism">Alternative: Minimalism</a></h2>
 <p>Alternatively, we might only provide:</p>
-<pre><code class="language-rust ignore">impl Neglect {
+<pre><code class="language-rust ignore">impl Assume {
     pub const NOTHING: Self = Self {
         alignment   : false,
         lifetimes   : false,
@@ -324,14 +324,14 @@ impl const core::ops::Add for Neglect {
     };
 }
 </code></pre>
-<p>This is the minimum impl we must provide for <code>Neglect</code> to be useful. With it, <code>Neglect</code> values can be created:</p>
+<p>This is the minimum impl we must provide for <code>Assume</code> to be useful. With it, <code>Assume</code> values can be created:</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>const NEGLECT_ALIGNMENT: Neglect = {
-  let mut neglect = Neglect::NOTHING;
-  neglect.alignment = true;
-  neglect
+</span>const ASSUME_ALIGNMENT: Assume = {
+  let mut assume = Assume::NOTHING;
+  assume.alignment = true;
+  assume
 };
 <span class="boring">}
 </span></code></pre></pre>
@@ -339,36 +339,36 @@ impl const core::ops::Add for Neglect {
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>const ALSO_NEGLECT_ALIGNMENT_VALIDITY: Neglect = {
-  let mut neglect = NEGLECT;
-  neglect.alignment = true;
-  neglect.validity = true;
-  neglect
+</span>const ALSO_ASSUME_ALIGNMENT_VALIDITY: Assume = {
+  let mut assume = ASSUME;
+  assume.alignment = true;
+  assume.validity = true;
+  assume
 };
 <span class="boring">}
 </span></code></pre></pre>
 <p>This approach achieves minimalism at the cost of ergonomics.</p>
 <h2><a class="header" href="#alternative-builder-methods" id="alternative-builder-methods">Alternative: Builder Methods</a></h2>
 <p>Alternatively, we could define chainable builder methods:</p>
-<pre><code class="language-rust ignore">impl Neglect {
-    pub const NOTHING: Self = Neglect {
+<pre><code class="language-rust ignore">impl Assume {
+    pub const NOTHING: Self = Assume {
         alignment   : false,
         lifetimes   : false,
         validity    : false,
         visibility  : false,
     };
 
-    pub const fn alignment(self)  -&gt; Self { Neglect { alignment:  true, ..self } }
-    pub const fn lifetimes(self)  -&gt; Self { Neglect { lifetimes:  true, ..self } }
-    pub const fn validity(self)   -&gt; Self { Neglect { validity:   true, ..self } }
-    pub const fn visibility(self) -&gt; Self { Neglect { visibility: true, ..self } }
+    pub const fn alignment(self)  -&gt; Self { Assume { alignment:  true, ..self } }
+    pub const fn lifetimes(self)  -&gt; Self { Assume { lifetimes:  true, ..self } }
+    pub const fn validity(self)   -&gt; Self { Assume { validity:   true, ..self } }
+    pub const fn visibility(self) -&gt; Self { Assume { visibility: true, ..self } }
 }
 </code></pre>
-<p>With this, <code>Neglect</code> values can be created:</p>
-<pre><code class="language-rust ignore">Neglect::NOTHING.alignment()
+<p>With this, <code>Assume</code> values can be created:</p>
+<pre><code class="language-rust ignore">Assume::NOTHING.alignment()
 </code></pre>
 <p>...and combined:</p>
-<pre><code class="language-rust ignore">NEGLECT.alignment().validity()
+<pre><code class="language-rust ignore">ASSUME.alignment().validity()
 </code></pre>
 <p>This approach is almost as succinct as the approach selected by this proposal (i.e., the <code>Add</code> impl), but meaning of the resulting expressions are not quite as self-evident.</p>
 <h1><a class="header" href="#spotlight-scope" id="spotlight-scope">Spotlight: Scope</a></h1>
@@ -414,7 +414,7 @@ mod b {
 <h1><a class="header" href="#how-does-scope-ensure-safety" id="how-does-scope-ensure-safety">How does <code>Scope</code> ensure safety?</a></h1>
 <p>It's generally unsound to construct instances of types for which you do not have a constructor.</p>
 <p>If <code>BikeshedIntrinsicFrom</code> <em>lacked</em> a <code>Scope</code> parameter; e.g.,:</p>
-<pre><code class="language-rust ignore">// we'll also omit `NEGLECT` for brevity
+<pre><code class="language-rust ignore">// we'll also omit `ASSUME` for brevity
 pub unsafe trait BikeshedIntrinsicFrom&lt;Src&gt;
 where
     Src: ?Sized
@@ -459,7 +459,7 @@ mod b {
 <p>In module <code>a</code>, <code>NoPublicConstructor</code> must implement <code>BikeshedIntrinsicFrom&lt;u32&gt;</code>. In module <code>b</code>, it must not. This inconsistency is incompatible with Rust's trait system.</p>
 <h2><a class="header" href="#solution" id="solution">Solution</a></h2>
 <p>We resolve this inconsistency by introducing a type parameter, <code>Scope</code>, that allows Rust to distinguish between these two contexts:</p>
-<pre><code class="language-rust ignore">// we omit `NEGLECT` for brevity
+<pre><code class="language-rust ignore">// we omit `ASSUME` for brevity
 pub unsafe trait BikeshedIntrinsicFrom&lt;Src, Scope&gt;
 where
     Src: ?Sized
@@ -509,7 +509,7 @@ mod b {
 <p><strong>Not generally.</strong></p>
 <p>Consider a hypothetical <code>FromZeros</code> trait that indicates whether <code>Self</code> is safely initializable from a sufficiently large buffer of zero-initialized bytes:</p>
 <pre><code class="language-rust ignore">pub mod zerocopy {
-    pub unsafe trait FromZeros&lt;const NEGLECT: Neglect&gt; {
+    pub unsafe trait FromZeros&lt;const ASSUME: Assume&gt; {
         /// Safely initialize `Self` from zeroed bytes.
         fn zeroed() -&gt; Self;
     }
@@ -519,9 +519,9 @@ mod b {
         Zero = 0u8
     }
 
-    unsafe impl&lt;Dst, const NEGLECT: Neglect&gt; FromZeros&lt;NEGLECT&gt; for Dst
+    unsafe impl&lt;Dst, const ASSUME: Assume&gt; FromZeros&lt;ASSUME&gt; for Dst
     where
-        Dst: BikeshedIntrinsicFrom&lt;[Zero; mem::MAX_OBJ_SIZE], ???, NEGLECT&gt;,
+        Dst: BikeshedIntrinsicFrom&lt;[Zero; mem::MAX_OBJ_SIZE], ???, ASSUME&gt;,
     {
         fn zeroed() -&gt; Self {
             unsafe { mem::transmute([Zero; size_of::&lt;Self&gt;]) }
@@ -531,14 +531,14 @@ mod b {
 </code></pre>
 <p>The above definition leaves ambiguous (<code>???</code>) the scope in which the constructability of <code>Dst</code> is checked: is it from the perspective of where this trait is defined, or where this trait is <em>used</em>? In this example, you probably do <em>not</em> intend for this trait to <em>only</em> be usable with <code>Dst</code> types that are defined in the same scope as the <code>FromZeros</code> trait!</p>
 <p>An explicit <code>Scope</code> parameter on <code>FromZeros</code> makes this unambiguous; the transmutability of <code>Dst</code> should be assessed from where the trait is used, <em>not</em> where it is defined:</p>
-<pre><code class="language-rust ignore">pub unsafe trait FromZeros&lt;Scope, const NEGLECT: Neglect&gt; {
+<pre><code class="language-rust ignore">pub unsafe trait FromZeros&lt;Scope, const ASSUME: Assume&gt; {
     /// Safely initialize `Self` from zeroed bytes.
     fn zeroed() -&gt; Self;
 }
 
-unsafe impl&lt;Dst, Scope, const NEGLECT: Neglect&gt; FromZeros&lt;Scope, NEGLECT&gt; for Dst
+unsafe impl&lt;Dst, Scope, const ASSUME: Assume&gt; FromZeros&lt;Scope, ASSUME&gt; for Dst
 where
-    Dst: BikeshedIntrinsicFrom&lt;[Zero; usize::MAX], Scope, NEGLECT&gt;
+    Dst: BikeshedIntrinsicFrom&lt;[Zero; usize::MAX], Scope, ASSUME&gt;
 {
     fn zeroed() -&gt; Self {
         unsafe { mem::transmute([Zero; size_of::&lt;Self&gt;]) }
@@ -548,12 +548,12 @@ where
 <h1><a class="header" href="#use-case-auditing-existing-code" id="use-case-auditing-existing-code">Use-Case: Auditing Existing Code</a></h1>
 <p><code>BikeshedIntrinsicFrom</code> can be used to audit the soundness of existing transmutations in code-bases. This macro demonstrates a drop-in replacement to <code>mem::transmute</code> that produces a compile error if the transmutation is unsound:</p>
 <pre><code class="language-rust ignored">macro_rules! transmute {
-    ($src:expr) =&gt; {transmute!($src, Neglect {})};
-    ($src:expr, Neglect { $( $neglect:ident ),* } ) =&gt; {{
+    ($src:expr) =&gt; {transmute!($src, Assume {})};
+    ($src:expr, Assume { $( $assume:ident ),* } ) =&gt; {{
         #[inline(always)]
-        unsafe fn transmute&lt;Src, Dst, Scope, const NEGLECT: Neglect&gt;(src: Src) -&gt; Dst
+        unsafe fn transmute&lt;Src, Dst, Scope, const ASSUME: Assume&gt;(src: Src) -&gt; Dst
         where
-            Dst: BikeshedIntrinsicFrom&lt;Src, Scope, NEGLECT&gt;
+            Dst: BikeshedIntrinsicFrom&lt;Src, Scope, ASSUME&gt;
         {
             #[repr(C)]
             union Transmute&lt;Src, Dst&gt; {
@@ -566,13 +566,13 @@ where
 
         struct Scope;
 
-        const NEGLECT: Neglect = {
-            let mut neglect = Neglect::NOTHING;
-            $(neglect . $neglect = true;)*
-            neglect
+        const ASSUME: Assume = {
+            let mut assume = Assume::NOTHING;
+            $(assume . $assume = true;)*
+            assume
         };
 
-        transmute::&lt;_, _, Scope, NEGLECT&gt;($src)
+        transmute::&lt;_, _, Scope, ASSUME&gt;($src)
     }};
 }
 </code></pre>
@@ -586,10 +586,10 @@ where
     unsafe { transmute!(v) } // Compile Error!
 }
 </code></pre>
-<p>...that we may resolve by explicitly neglecting validity:</p>
+<p>...that we may resolve by explicitly instructing the compiler to assume validity:</p>
 <pre><code class="language-rust ignore">fn foo(v: u8) -&gt; bool {
     assert!(v &lt; 2);
-    unsafe { transmute!(v, Neglect { validity }) }
+    unsafe { transmute!(v, Assume { validity }) }
 }
 </code></pre>
 <h1><a class="header" href="#use-case-abstraction" id="use-case-abstraction">Use-Case: Abstraction</a></h1>
@@ -613,7 +613,7 @@ unsafe impl&lt;Src, Dst&gt; MuckFrom&lt;Src&gt; for Dst
 where
     Src: Muckable,
     Dst: Muckable,
-    Dst: BikeshedIntrinsicFrom&lt;Src, !, {Neglect::VISIBILITY}&gt;
+    Dst: BikeshedIntrinsicFrom&lt;Src, !, {Assume::VISIBILITY}&gt;
 {
     fn muck_from(src: Src) -&gt; Self
     where
@@ -662,9 +662,9 @@ where
 <h1><a class="header" href="#should-the-trait-have-methods" id="should-the-trait-have-methods">Should the trait have methods?</a></h1>
 <p>Many use-cases of <code>BikeshedIntrinsicFrom</code> involve using something like this <code>BikeshedIntrinsicFrom</code>-bounded function:</p>
 <pre><code class="language-rust ignore">#[inline(always)]
-unsafe fn transmute&lt;Src, Dst, Scope, const NEGLECT: Neglect&gt;(src: Src) -&gt; Dst
+unsafe fn transmute&lt;Src, Dst, Scope, const ASSUME: Assume&gt;(src: Src) -&gt; Dst
 where
-    Dst: BikeshedIntrinsicFrom&lt;Src, Scope, NEGLECT&gt;
+    Dst: BikeshedIntrinsicFrom&lt;Src, Scope, ASSUME&gt;
 {
 
     #[repr(C)]
@@ -681,9 +681,9 @@ where
 <p>We could resolve this conflict by:</p>
 <ol>
 <li>using a <a href="./unresolved-trait-name.html">name</a> other than &quot;transmute&quot; for this proposal.</li>
-<li>placing <code>BikeshedIntrinsicFrom</code>, <code>Neglect</code>, and this function under a new module (e.g., <code>mem::cast</code>)</li>
+<li>placing <code>BikeshedIntrinsicFrom</code>, <code>Assume</code>, and this function under a new module (e.g., <code>mem::cast</code>)</li>
 <li>defining an associated function on <code>BikeshedIntrinsicFrom</code>; e.g.:
-<pre><code class="language-rust ignore">pub unsafe trait BikeshedIntrinsicFrom&lt;Src, Scope, const NEGLECT: Neglect&gt;
+<pre><code class="language-rust ignore">pub unsafe trait BikeshedIntrinsicFrom&lt;Src, Scope, const ASSUME: Assume&gt;
 where
     Src: ?Sized
 {
@@ -706,7 +706,7 @@ where
 <h1><a class="header" href="#trait-orientation-from-or-into" id="trait-orientation-from-or-into">Trait Orientation: <code>From</code> or <code>Into</code>?</a></h1>
 <p>Should it be <code>BikeshedIntrinsicFrom</code> or <code>BikeshedIntrinsicInto</code>? What factors should be considered?</p>
 <h2><a class="header" href="#from" id="from"><code>From</code></a></h2>
-<pre><code class="language-rust ignore">pub unsafe trait BikeshedIntrinsicFrom&lt;Src, Scope, const NEGLECT: Neglect&gt;
+<pre><code class="language-rust ignore">pub unsafe trait BikeshedIntrinsicFrom&lt;Src, Scope, const ASSUME: Assume&gt;
 where
     Src: ?Sized
 {
@@ -726,7 +726,7 @@ where
 }
 </code></pre>
 <h2><a class="header" href="#into" id="into"><code>Into</code></a></h2>
-<pre><code class="language-rust ignore">pub unsafe trait BikeshedIntrinsicInto&lt;Dst, Scope, const NEGLECT: Neglect&gt;
+<pre><code class="language-rust ignore">pub unsafe trait BikeshedIntrinsicInto&lt;Dst, Scope, const ASSUME: Assume&gt;
 where
     Dst: ?Sized
 {

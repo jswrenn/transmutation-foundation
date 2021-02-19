@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="neglect.html"><strong aria-hidden="true">1.</strong> Spotlight: Neglect</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="neglect-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Neglect?</a></li><li class="chapter-item expanded "><a href="neglect-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Neglect a const parameter?</a></li><li class="chapter-item expanded "><a href="neglect-combining.html"><strong aria-hidden="true">1.3.</strong> How should Neglects be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="options.html"><strong aria-hidden="true">1.</strong> Spotlight: Assume</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="options-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Assume?</a></li><li class="chapter-item expanded "><a href="options-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Assume a const parameter?</a></li><li class="chapter-item expanded "><a href="options-combining.html"><strong aria-hidden="true">1.3.</strong> How should Assumes be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -165,12 +165,12 @@
                     <main>
                         <h1><a class="header" href="#overview" id="overview">Overview</a></h1>
 <p>We propose that this <em>compiler-intrinsic</em> trait (end-users <em>cannot</em> implement it) be added to <code>core::mem</code>:</p>
-<pre><code class="language-rust ignore">pub unsafe trait BikeshedIntrinsicFrom&lt;Src, Scope, const NEGLECT: Neglect&gt;
+<pre><code class="language-rust ignore">pub unsafe trait BikeshedIntrinsicFrom&lt;Src, Scope, const ASSUME: Assume&gt;
 where
     Src: ?Sized
 {}
 </code></pre>
-<p>This trait is capable of telling you whether a particular bit-reinterpretation cast from <code>Src</code> to <code>Self</code> is well-defined and safe (notwithstanding whatever static checks you decide to <code>Neglect</code>).</p>
+<p>This trait is capable of telling you whether a particular bit-reinterpretation cast from <code>Src</code> to <code>Self</code> is well-defined and safe (notwithstanding whatever static checks you decide to <code>Assume</code>).</p>
 <p>This trait is useful:</p>
 <ol>
 <li><a href="./use-case-auditing.html">for auditing the safety of existing code</a></li>
@@ -185,25 +185,25 @@ where
 <li>construct hidden fields of the <code>Dst</code> type</li>
 </ol>
 <p>Whether these conditions are satisfied depends on the scope the transmutation occurs in. The existing mechanism of <a href="https://rust-lang.github.io/rfcs/2145-type-privacy.html">type privacy</a> will ensure that first condition is satisfied. To enforce the second and third conditions, we introduce the <code>Scope</code> type parameter (see below). </p>
-<h2><a class="header" href="#what-is-neglect" id="what-is-neglect">What is <code>Neglect</code>?</a></h2>
-<p>The <code>Neglect</code> parameter encodes the set of static checks that the compiler should ignore when determining transmutability. These checks include:</p>
+<h2><a class="header" href="#what-is-assume" id="what-is-assume">What is <code>Assume</code>?</a></h2>
+<p>The <code>Assume</code> parameter encodes the set of static checks that the compiler should ignore when determining transmutability. These checks include:</p>
 <ul>
 <li>alignment</li>
 <li>lifetimes</li>
 <li>validity</li>
 <li>visibility</li>
 </ul>
-<p>Neglecting <em>any</em> static checks disqualifies a transmutation from being safe. The <code>Neglect</code> type is represented like this:</p>
+<p>Assumeing <em>any</em> static checks disqualifies a transmutation from being safe. The <code>Assume</code> type is represented like this:</p>
 <pre><code class="language-rust ignore">#[derive(PartialEq, Eq)]
 #[non_exhaustive]
-pub struct Neglect {
+pub struct Assume {
     pub alignment   : bool,
     pub lifetimes   : bool,
     pub validity    : bool,
     pub visibility  : bool,
 }
 
-impl Neglect {
+impl Assume {
     pub const NOTHING: Self = Self {
         alignment   : false,
         lifetimes   : false,
@@ -217,7 +217,7 @@ impl Neglect {
     pub const VISIBILITY: Self = Self {validity:  true, ..Self::NOTHING};
 }
 
-impl const core::ops::Add for Neglect {
+impl const core::ops::Add for Assume {
     type Output = Self;
 
     fn add(self, other: Self) -&gt; Self {
@@ -230,11 +230,11 @@ impl const core::ops::Add for Neglect {
     }
 }
 </code></pre>
-<p><strong>For more information, see <a href="neglect.html">here</a>.</strong></p>
+<p><strong>For more information, see <a href="options.html">here</a>.</strong></p>
 <h2><a class="header" href="#what-is-scope" id="what-is-scope">What is <code>Scope</code>?</a></h2>
 <p>The <code>Scope</code> parameter of <code>BikeshedIntrinsicFrom</code> is used to ensure that the second and third safety conditions are satisfied.</p>
 <p>When visibility is enforced, <code>Scope</code> must be instantiated with any private (i.e., <code>pub(self)</code> type. The compiler pretends that it is at the defining scope of that type, and checks that the necessary fields of <code>Src</code> and <code>Dst</code> are visible.</p>
-<p>When visibility is neglected, the <code>Scope</code> parameter is ignored.</p>
+<p>When visibility is assumed, the <code>Scope</code> parameter is ignored.</p>
 <p><strong>For more information, see <a href="scope.html">here</a>.</strong></p>
 
                     </main>
@@ -244,7 +244,7 @@ impl const core::ops::Add for Neglect {
                         
 
                         
-                            <a rel="next" href="neglect.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="options.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -258,7 +258,7 @@ impl const core::ops::Add for Neglect {
                 
 
                 
-                    <a rel="next" href="neglect.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="options.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

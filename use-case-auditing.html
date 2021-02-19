@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="neglect.html"><strong aria-hidden="true">1.</strong> Spotlight: Neglect</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="neglect-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Neglect?</a></li><li class="chapter-item expanded "><a href="neglect-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Neglect a const parameter?</a></li><li class="chapter-item expanded "><a href="neglect-combining.html"><strong aria-hidden="true">1.3.</strong> How should Neglects be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html" class="active"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="options.html"><strong aria-hidden="true">1.</strong> Spotlight: Assume</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="options-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Assume?</a></li><li class="chapter-item expanded "><a href="options-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Assume a const parameter?</a></li><li class="chapter-item expanded "><a href="options-combining.html"><strong aria-hidden="true">1.3.</strong> How should Assumes be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html" class="active"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,12 +166,12 @@
                         <h1><a class="header" href="#use-case-auditing-existing-code" id="use-case-auditing-existing-code">Use-Case: Auditing Existing Code</a></h1>
 <p><code>BikeshedIntrinsicFrom</code> can be used to audit the soundness of existing transmutations in code-bases. This macro demonstrates a drop-in replacement to <code>mem::transmute</code> that produces a compile error if the transmutation is unsound:</p>
 <pre><code class="language-rust ignored">macro_rules! transmute {
-    ($src:expr) =&gt; {transmute!($src, Neglect {})};
-    ($src:expr, Neglect { $( $neglect:ident ),* } ) =&gt; {{
+    ($src:expr) =&gt; {transmute!($src, Assume {})};
+    ($src:expr, Assume { $( $assume:ident ),* } ) =&gt; {{
         #[inline(always)]
-        unsafe fn transmute&lt;Src, Dst, Scope, const NEGLECT: Neglect&gt;(src: Src) -&gt; Dst
+        unsafe fn transmute&lt;Src, Dst, Scope, const ASSUME: Assume&gt;(src: Src) -&gt; Dst
         where
-            Dst: BikeshedIntrinsicFrom&lt;Src, Scope, NEGLECT&gt;
+            Dst: BikeshedIntrinsicFrom&lt;Src, Scope, ASSUME&gt;
         {
             #[repr(C)]
             union Transmute&lt;Src, Dst&gt; {
@@ -184,13 +184,13 @@
 
         struct Scope;
 
-        const NEGLECT: Neglect = {
-            let mut neglect = Neglect::NOTHING;
-            $(neglect . $neglect = true;)*
-            neglect
+        const ASSUME: Assume = {
+            let mut assume = Assume::NOTHING;
+            $(assume . $assume = true;)*
+            assume
         };
 
-        transmute::&lt;_, _, Scope, NEGLECT&gt;($src)
+        transmute::&lt;_, _, Scope, ASSUME&gt;($src)
     }};
 }
 </code></pre>
@@ -204,10 +204,10 @@
     unsafe { transmute!(v) } // Compile Error!
 }
 </code></pre>
-<p>...that we may resolve by explicitly neglecting validity:</p>
+<p>...that we may resolve by explicitly instructing the compiler to assume validity:</p>
 <pre><code class="language-rust ignore">fn foo(v: u8) -&gt; bool {
     assert!(v &lt; 2);
-    unsafe { transmute!(v, Neglect { validity }) }
+    unsafe { transmute!(v, Assume { validity }) }
 }
 </code></pre>
 

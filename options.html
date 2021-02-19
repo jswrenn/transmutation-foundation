@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>How should Neglects be created, combined? - Foundational Proposal</title>
+        <title>Spotlight: Assume - Foundational Proposal</title>
         
         
 
@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="neglect.html"><strong aria-hidden="true">1.</strong> Spotlight: Neglect</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="neglect-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Neglect?</a></li><li class="chapter-item expanded "><a href="neglect-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Neglect a const parameter?</a></li><li class="chapter-item expanded "><a href="neglect-combining.html" class="active"><strong aria-hidden="true">1.3.</strong> How should Neglects be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="options.html" class="active"><strong aria-hidden="true">1.</strong> Spotlight: Assume</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="options-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Assume?</a></li><li class="chapter-item expanded "><a href="options-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Assume a const parameter?</a></li><li class="chapter-item expanded "><a href="options-combining.html"><strong aria-hidden="true">1.3.</strong> How should Assumes be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -163,108 +163,25 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#how-should-neglect-values-be-created-combined" id="how-should-neglect-values-be-created-combined">How should <code>Neglect</code> values be created, combined?</a></h1>
-<p>To initialize and combine <code>Neglect</code> values, this proposal defines a set of associated constants and an <code>Add</code> impl:</p>
-<pre><code class="language-rust ignore">impl Neglect {
-    pub const NOTHING: Self = Self {
-        alignment   : false,
-        lifetimes   : false,
-        validity    : false,
-        visibility  : false,
-    };
-
-    pub const ALIGNMENT:  Self = Self {alignment: true, ..Self::NOTHING};
-    pub const LIFETIMES:  Self = Self {lifetimes: true, ..Self::NOTHING};
-    pub const VALIDITY:   Self = Self {validity:  true, ..Self::NOTHING};
-    pub const VISIBILITY: Self = Self {validity:  true, ..Self::NOTHING};
-}
-
-impl const core::ops::Add for Neglect {
-    type Output = Self;
-
-    fn add(self, other: Self) -&gt; Self {
-        Self {
-            alignment   : self.alignment  || other.alignment,
-            lifetimes   : self.lifetimes  || other.lifetimes,
-            validity    : self.validity   || other.validity,
-            visibility  : self.visibility || other.visibility,
-        }
-    }
-}
-</code></pre>
-<p>Consequently, <code>Neglect</code> values can be ergonomically created (e.g., <code>Neglect::ALIGNMENT</code>) and combined (e.g., <code>Neglect::ALIGNMENT + Neglect::VALIDITY + NEGLECT</code>).</p>
-<p>Let's contrast this approach with two other possibilities:</p>
-<h2><a class="header" href="#alternative-minimalism" id="alternative-minimalism">Alternative: Minimalism</a></h2>
-<p>Alternatively, we might only provide:</p>
-<pre><code class="language-rust ignore">impl Neglect {
-    pub const NOTHING: Self = Self {
-        alignment   : false,
-        lifetimes   : false,
-        validity    : false,
-        visibility  : false,
-    };
-}
-</code></pre>
-<p>This is the minimum impl we must provide for <code>Neglect</code> to be useful. With it, <code>Neglect</code> values can be created:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>const NEGLECT_ALIGNMENT: Neglect = {
-  let mut neglect = Neglect::NOTHING;
-  neglect.alignment = true;
-  neglect
-};
-<span class="boring">}
-</span></code></pre></pre>
-<p>and combined:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>const ALSO_NEGLECT_ALIGNMENT_VALIDITY: Neglect = {
-  let mut neglect = NEGLECT;
-  neglect.alignment = true;
-  neglect.validity = true;
-  neglect
-};
-<span class="boring">}
-</span></code></pre></pre>
-<p>This approach achieves minimalism at the cost of ergonomics.</p>
-<h2><a class="header" href="#alternative-builder-methods" id="alternative-builder-methods">Alternative: Builder Methods</a></h2>
-<p>Alternatively, we could define chainable builder methods:</p>
-<pre><code class="language-rust ignore">impl Neglect {
-    pub const NOTHING: Self = Neglect {
-        alignment   : false,
-        lifetimes   : false,
-        validity    : false,
-        visibility  : false,
-    };
-
-    pub const fn alignment(self)  -&gt; Self { Neglect { alignment:  true, ..self } }
-    pub const fn lifetimes(self)  -&gt; Self { Neglect { lifetimes:  true, ..self } }
-    pub const fn validity(self)   -&gt; Self { Neglect { validity:   true, ..self } }
-    pub const fn visibility(self) -&gt; Self { Neglect { visibility: true, ..self } }
-}
-</code></pre>
-<p>With this, <code>Neglect</code> values can be created:</p>
-<pre><code class="language-rust ignore">Neglect::NOTHING.alignment()
-</code></pre>
-<p>...and combined:</p>
-<pre><code class="language-rust ignore">NEGLECT.alignment().validity()
-</code></pre>
-<p>This approach is almost as succinct as the approach selected by this proposal (i.e., the <code>Add</code> impl), but meaning of the resulting expressions are not quite as self-evident.</p>
+                        <h1><a class="header" href="#spotlight-on-assume" id="spotlight-on-assume">Spotlight on <code>Assume</code></a></h1>
+<ul>
+<li><a href="./options-why.html">Why do we need <code>Assume</code>?</a></li>
+<li><a href="./options-encoding.html">Why is <code>Assume</code> a <code>const</code> parameter?</a></li>
+<li><a href="./options-combining.html">How should <code>Assume</code> values be created, combined?</a></li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="neglect-encoding.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="scope.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="options-why.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -276,13 +193,13 @@ impl const core::ops::Add for Neglect {
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="neglect-encoding.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="scope.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="options-why.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

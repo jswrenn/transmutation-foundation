@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Why is Neglect a const parameter? - Foundational Proposal</title>
+        <title>Why is Assume a const parameter? - Foundational Proposal</title>
         
         
 
@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="neglect.html"><strong aria-hidden="true">1.</strong> Spotlight: Neglect</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="neglect-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Neglect?</a></li><li class="chapter-item expanded "><a href="neglect-encoding.html" class="active"><strong aria-hidden="true">1.2.</strong> Why is Neglect a const parameter?</a></li><li class="chapter-item expanded "><a href="neglect-combining.html"><strong aria-hidden="true">1.3.</strong> How should Neglects be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="options.html"><strong aria-hidden="true">1.</strong> Spotlight: Assume</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="options-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Assume?</a></li><li class="chapter-item expanded "><a href="options-encoding.html" class="active"><strong aria-hidden="true">1.2.</strong> Why is Assume a const parameter?</a></li><li class="chapter-item expanded "><a href="options-combining.html"><strong aria-hidden="true">1.3.</strong> How should Assumes be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -163,19 +163,19 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#why-is-neglect-a-const-parameter" id="why-is-neglect-a-const-parameter">Why is Neglect a const parameter?</a></h1>
-<p>We've considered <a href="https://hackmd.io/@jswrenn/S192QCR9D">a few different ways</a> in which <code>Neglect</code> might be represented. An ideal representation has three properties:</p>
+                        <h1><a class="header" href="#why-is-assume-a-const-parameter" id="why-is-assume-a-const-parameter">Why is Assume a const parameter?</a></h1>
+<p>We've considered <a href="https://hackmd.io/@jswrenn/S192QCR9D">a few different ways</a> in which <code>Assume</code> might be represented. An ideal representation has three properties:</p>
 <ol>
-<li>is defaultable with &quot;neglect nothing&quot;, so doing the totally safe thing is truly the easiest thing</li>
-<li>every subset of neglected options has exactly <em>one</em> encoding (i.e., neglecting validity and alignment is the same as neglecting alignment and validity)</li>
-<li>is generically adjustable (i.e., I can add or remove a neglect from an existing set of options)</li>
+<li>is defaultable with &quot;assume nothing&quot;, so doing the totally safe thing is truly the easiest thing</li>
+<li>every subset of assumptions has exactly <em>one</em> encoding (i.e., assuming validity and alignment is the same as assuming alignment and validity)</li>
+<li>is generically adjustable (i.e., I can add or remove an assumption from an existing set of options)</li>
 </ol>
 <p>The type parameter approaches we've considered tick both the first box, and <em>either</em> the second xor third. The sorts of type system extensions that would permit ticking all three of these boxes with a type parameter are far off.</p>
 <p>In contrast:</p>
 <ol>
-<li>A const generic <code>Neglect</code> parameter is <em>not</em> (yet) defaultable, but this doesn't seem like a permanent limitation of const generics.</li>
-<li>The const generic <code>Neglect</code> admits exactly one encoding of each subset. The value produced by <code>Neglect {alignment: true, validity: true}</code> is identical to the value produced by <code>Neglect {validity: true, alignment: true}</code>.</li>
-<li>The const generic <code>Neglect</code> is generically extendable. Given an existing, arbitrary <code>NEGLECT</code>, we additionally can disable the alignment check with <code>{Neglect::ALIGNMENT + NEGLECT}</code>.</li>
+<li>A const generic <code>Assume</code> parameter is <em>not</em> (yet) defaultable, but this doesn't seem like a permanent limitation of const generics.</li>
+<li>The const generic <code>Assume</code> admits exactly one encoding of each subset. The value produced by <code>Assume {alignment: true, validity: true}</code> is identical to the value produced by <code>Assume {validity: true, alignment: true}</code>.</li>
+<li>The const generic <code>Assume</code> is generically extendable. Given an existing, arbitrary <code>ASSUME</code>, we additionally can disable the alignment check with <code>{Assume::ALIGNMENT + ASSUME}</code>.</li>
 </ol>
 
                     </main>
@@ -183,13 +183,13 @@
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="neglect-why.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="options-why.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="neglect-combining.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="options-combining.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -201,13 +201,13 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="neglect-why.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="options-why.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="neglect-combining.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="options-combining.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="neglect.html"><strong aria-hidden="true">1.</strong> Spotlight: Neglect</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="neglect-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Neglect?</a></li><li class="chapter-item expanded "><a href="neglect-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Neglect a const parameter?</a></li><li class="chapter-item expanded "><a href="neglect-combining.html"><strong aria-hidden="true">1.3.</strong> How should Neglects be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html" class="active"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="options.html"><strong aria-hidden="true">1.</strong> Spotlight: Assume</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="options-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Assume?</a></li><li class="chapter-item expanded "><a href="options-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Assume a const parameter?</a></li><li class="chapter-item expanded "><a href="options-combining.html"><strong aria-hidden="true">1.3.</strong> How should Assumes be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html" class="active"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -167,7 +167,7 @@
 <p><strong>Not generally.</strong></p>
 <p>Consider a hypothetical <code>FromZeros</code> trait that indicates whether <code>Self</code> is safely initializable from a sufficiently large buffer of zero-initialized bytes:</p>
 <pre><code class="language-rust ignore">pub mod zerocopy {
-    pub unsafe trait FromZeros&lt;const NEGLECT: Neglect&gt; {
+    pub unsafe trait FromZeros&lt;const ASSUME: Assume&gt; {
         /// Safely initialize `Self` from zeroed bytes.
         fn zeroed() -&gt; Self;
     }
@@ -177,9 +177,9 @@
         Zero = 0u8
     }
 
-    unsafe impl&lt;Dst, const NEGLECT: Neglect&gt; FromZeros&lt;NEGLECT&gt; for Dst
+    unsafe impl&lt;Dst, const ASSUME: Assume&gt; FromZeros&lt;ASSUME&gt; for Dst
     where
-        Dst: BikeshedIntrinsicFrom&lt;[Zero; mem::MAX_OBJ_SIZE], ???, NEGLECT&gt;,
+        Dst: BikeshedIntrinsicFrom&lt;[Zero; mem::MAX_OBJ_SIZE], ???, ASSUME&gt;,
     {
         fn zeroed() -&gt; Self {
             unsafe { mem::transmute([Zero; size_of::&lt;Self&gt;]) }
@@ -189,14 +189,14 @@
 </code></pre>
 <p>The above definition leaves ambiguous (<code>???</code>) the scope in which the constructability of <code>Dst</code> is checked: is it from the perspective of where this trait is defined, or where this trait is <em>used</em>? In this example, you probably do <em>not</em> intend for this trait to <em>only</em> be usable with <code>Dst</code> types that are defined in the same scope as the <code>FromZeros</code> trait!</p>
 <p>An explicit <code>Scope</code> parameter on <code>FromZeros</code> makes this unambiguous; the transmutability of <code>Dst</code> should be assessed from where the trait is used, <em>not</em> where it is defined:</p>
-<pre><code class="language-rust ignore">pub unsafe trait FromZeros&lt;Scope, const NEGLECT: Neglect&gt; {
+<pre><code class="language-rust ignore">pub unsafe trait FromZeros&lt;Scope, const ASSUME: Assume&gt; {
     /// Safely initialize `Self` from zeroed bytes.
     fn zeroed() -&gt; Self;
 }
 
-unsafe impl&lt;Dst, Scope, const NEGLECT: Neglect&gt; FromZeros&lt;Scope, NEGLECT&gt; for Dst
+unsafe impl&lt;Dst, Scope, const ASSUME: Assume&gt; FromZeros&lt;Scope, ASSUME&gt; for Dst
 where
-    Dst: BikeshedIntrinsicFrom&lt;[Zero; usize::MAX], Scope, NEGLECT&gt;
+    Dst: BikeshedIntrinsicFrom&lt;[Zero; usize::MAX], Scope, ASSUME&gt;
 {
     fn zeroed() -&gt; Self {
         unsafe { mem::transmute([Zero; size_of::&lt;Self&gt;]) }

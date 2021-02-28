@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Why is safety dependent on context? - Foundational Proposal</title>
+        <title>Can't Context be elided? - Foundational Proposal</title>
         
         
 
@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="options.html"><strong aria-hidden="true">1.</strong> Spotlight: Assume</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="options-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Assume?</a></li><li class="chapter-item expanded "><a href="options-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Assume a const parameter?</a></li><li class="chapter-item expanded "><a href="options-combining.html"><strong aria-hidden="true">1.3.</strong> How should Assumes be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="scope.html"><strong aria-hidden="true">2.</strong> Spotlight: Scope</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="scope-safety.html" class="active"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="scope-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Scope ensure safety?</a></li><li class="chapter-item expanded "><a href="scope-inference.html"><strong aria-hidden="true">2.3.</strong> Can't Scope be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Overview</a></li><li class="chapter-item expanded "><a href="options.html"><strong aria-hidden="true">1.</strong> Spotlight: Assume</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="options-why.html"><strong aria-hidden="true">1.1.</strong> Why do we need Assume?</a></li><li class="chapter-item expanded "><a href="options-encoding.html"><strong aria-hidden="true">1.2.</strong> Why is Assume a const parameter?</a></li><li class="chapter-item expanded "><a href="options-combining.html"><strong aria-hidden="true">1.3.</strong> How should Assumes be created, combined?</a></li></ol></li><li class="chapter-item expanded "><a href="context.html"><strong aria-hidden="true">2.</strong> Spotlight: Context</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="context-safety.html"><strong aria-hidden="true">2.1.</strong> Why is safety dependent on context?</a></li><li class="chapter-item expanded "><a href="context-mechanism.html"><strong aria-hidden="true">2.2.</strong> How does Context ensure safety?</a></li><li class="chapter-item expanded "><a href="context-inference.html" class="active"><strong aria-hidden="true">2.3.</strong> Can't Context be elided?</a></li></ol></li><li class="chapter-item expanded "><a href="use-case-auditing.html"><strong aria-hidden="true">3.</strong> Use-Case: Auditing</a></li><li class="chapter-item expanded "><a href="use-case-abstraction.html"><strong aria-hidden="true">4.</strong> Use-Case: Abstraction</a></li><li class="chapter-item expanded "><a href="unresolved.html"><strong aria-hidden="true">5.</strong> Unresolved Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="unresolved-trait-name.html"><strong aria-hidden="true">5.1.</strong> Trait Name</a></li><li class="chapter-item expanded "><a href="unresolved-trait-methods.html"><strong aria-hidden="true">5.2.</strong> Trait Methods</a></li><li class="chapter-item expanded "><a href="unresolved-trait-orientation.html"><strong aria-hidden="true">5.3.</strong> Trait Orientation</a></li><li class="chapter-item expanded "><a href="unresolved-src-visibility.html"><strong aria-hidden="true">5.4.</strong> Visibility of Src</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -163,53 +163,59 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#why-is-safety-dependent-on-context" id="why-is-safety-dependent-on-context">Why is safety dependent on context?</a></h1>
-<p>In order to be safe, a well-defined transmutation must also not allow you to:</p>
-<ol>
-<li>construct instances of a hidden <code>Dst</code> type</li>
-<li>mutate hidden fields of the <code>Src</code> type</li>
-<li>construct hidden fields of the <code>Dst</code> type</li>
-</ol>
-<p>Whether these conditions are satisfied depends on the scope the transmutation occurs in, because scope determines the visibility of fields. Consider:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>mod a {
-    use super::*;
+                        <h1><a class="header" href="#cant-context-be-elided" id="cant-context-be-elided">Can't Context be elided?</a></h1>
+<p><strong>Not generally.</strong></p>
+<p>Consider a hypothetical <code>FromZeros</code> trait that indicates whether <code>Self</code> is safely initializable from a sufficiently large buffer of zero-initialized bytes:</p>
+<pre><code class="language-rust ignore">pub mod zerocopy {
+    pub unsafe trait FromZeros&lt;const ASSUME: Assume&gt; {
+        /// Safely initialize `Self` from zeroed bytes.
+        fn zeroed() -&gt; Self;
+    }
 
-    #[repr(C)]
-    pub struct NonZeroU32(u32);
+    #[repr(u8)]
+    enum Zero {
+        Zero = 0u8
+    }
 
-    impl NonZeroU32 {
-        fn new(v: u32) -&gt; Self {
-            unsafe { core::mem::transmute(v) } // sound.
+    unsafe impl&lt;Dst, const ASSUME: Assume&gt; FromZeros&lt;ASSUME&gt; for Dst
+    where
+        Dst: BikeshedIntrinsicFrom&lt;[Zero; mem::MAX_OBJ_SIZE], ???, ASSUME&gt;,
+    {
+        fn zeroed() -&gt; Self {
+            unsafe { mem::transmute([Zero; size_of::&lt;Self&gt;]) }
         }
     }
 }
+</code></pre>
+<p>The above definition leaves ambiguous (<code>???</code>) the context in which the constructability of <code>Dst</code> is checked: is it from the perspective of where this trait is defined, or where this trait is <em>used</em>? In this example, you probably do <em>not</em> intend for this trait to <em>only</em> be usable with <code>Dst</code> types that are defined in the same scope as the <code>FromZeros</code> trait!</p>
+<p>An explicit <code>Context</code> parameter on <code>FromZeros</code> makes this unambiguous; the transmutability of <code>Dst</code> should be assessed from where the trait is used, <em>not</em> where it is defined:</p>
+<pre><code class="language-rust ignore">pub unsafe trait FromZeros&lt;Context, const ASSUME: Assume&gt; {
+    /// Safely initialize `Self` from zeroed bytes.
+    fn zeroed() -&gt; Self;
+}
 
-mod b {
-    use super::*;
-
-    fn new(v: u32) -&gt; a::NonZeroU32 {
-        unsafe { core::mem::transmute(v) } // ☢️ UNSOUND!
+unsafe impl&lt;Dst, Context, const ASSUME: Assume&gt; FromZeros&lt;Context, ASSUME&gt; for Dst
+where
+    Dst: BikeshedIntrinsicFrom&lt;[Zero; usize::MAX], Context, ASSUME&gt;
+{
+    fn zeroed() -&gt; Self {
+        unsafe { mem::transmute([Zero; size_of::&lt;Self&gt;]) }
     }
 }
-<span class="boring">}
-</span></code></pre></pre>
-<p>The transmutation in <code>b</code> is unsound because it constructs a hidden field of <code>NonZeroU32</code>.</p>
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="scope.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="context-mechanism.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="scope-mechanism.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="use-case-auditing.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -221,13 +227,13 @@ mod b {
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="scope.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="context-mechanism.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="scope-mechanism.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="use-case-auditing.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

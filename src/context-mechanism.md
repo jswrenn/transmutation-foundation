@@ -1,8 +1,8 @@
-# How does `Scope` ensure safety?
+# How does `Context` ensure safety?
 
 It's generally unsound to construct instances of types for which you do not have a constructor.
 
-If `BikeshedIntrinsicFrom` *lacked* a `Scope` parameter; e.g.,:
+If `BikeshedIntrinsicFrom` *lacked* a `Context` parameter; e.g.,:
 ```rust,ignore
 // we'll also omit `ASSUME` for brevity
 pub unsafe trait BikeshedIntrinsicFrom<Src>
@@ -51,15 +51,15 @@ In module `a`, `NoPublicConstructor` must implement `BikeshedIntrinsicFrom<u32>`
 
 ## Solution
 
-We resolve this inconsistency by introducing a type parameter, `Scope`, that allows Rust to distinguish between these two contexts:
+We resolve this inconsistency by introducing a type parameter, `Context`, that allows Rust to distinguish between these two contexts:
 ```rust,ignore
 // we omit `ASSUME` for brevity
-pub unsafe trait BikeshedIntrinsicFrom<Src, Scope>
+pub unsafe trait BikeshedIntrinsicFrom<Src, Context>
 where
     Src: ?Sized
 {}
 ```
-`Scope` must be instantiated with any private (i.e., `pub(self)` type. To determine whether a transmutation is safe, the compiler pretends that it is at the defining scope of that type, and checks that the necessary fields of `Src` and `Dst` are visible.
+`Context` must be instantiated with any private (i.e., `pub(self)` type. To determine whether a transmutation is safe, the compiler pretends that it is at the defining scope of that type, and checks that the necessary fields of `Src` and `Dst` are visible.
 
 For example:
 ```rust,ignore

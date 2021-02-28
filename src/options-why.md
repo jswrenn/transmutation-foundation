@@ -12,9 +12,9 @@ Using a `ASSUME` parameter of `Assume::ALIGNMENT` makes `BikeshedIntrinsicFrom` 
 ///
 /// This produces `None` if the referent isn't appropriately
 /// aligned, as required by the destination type.
-fn try_cast_ref<'src, 'dst, Src, Dst, Scope>(src: &'src Src) -> Option<&'dst Dst>
+fn try_cast_ref<'src, 'dst, Src, Dst, Context>(src: &'src Src) -> Option<&'dst Dst>
 where
-    &'t T: BikeshedIntrinsicFrom<&'dst Dst, Scope, Assume::ALIGNMENT>,
+    &'t T: BikeshedIntrinsicFrom<&'dst Dst, Context, Assume::ALIGNMENT>,
 {
     // check alignment dynamically
     if (src as *const Src as usize) % align_of::<Dst>() != 0 {

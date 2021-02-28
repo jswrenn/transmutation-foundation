@@ -6,9 +6,9 @@ macro_rules! transmute {
     ($src:expr) => {transmute!($src, Assume {})};
     ($src:expr, Assume { $( $assume:ident ),* } ) => {{
         #[inline(always)]
-        unsafe fn transmute<Src, Dst, Scope, const ASSUME: Assume>(src: Src) -> Dst
+        unsafe fn transmute<Src, Dst, Context, const ASSUME: Assume>(src: Src) -> Dst
         where
-            Dst: BikeshedIntrinsicFrom<Src, Scope, ASSUME>
+            Dst: BikeshedIntrinsicFrom<Src, Context, ASSUME>
         {
             #[repr(C)]
             union Transmute<Src, Dst> {
@@ -19,7 +19,7 @@ macro_rules! transmute {
             ManuallyDrop::into_inner(Transmute { src: ManuallyDrop::new(src) }.dst)
         }
 
-        struct Scope;
+        struct Context;
 
         const ASSUME: Assume = {
             let mut assume = Assume::NOTHING;
@@ -27,7 +27,7 @@ macro_rules! transmute {
             assume
         };
 
-        transmute::<_, _, Scope, ASSUME>($src)
+        transmute::<_, _, Context, ASSUME>($src)
     }};
 }
 ```

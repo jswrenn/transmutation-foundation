@@ -3,9 +3,9 @@
 Many use-cases of `BikeshedIntrinsicFrom` involve using something like this `BikeshedIntrinsicFrom`-bounded function:
 ```rust,ignore
 #[inline(always)]
-unsafe fn transmute<Src, Dst, Scope, const ASSUME: Assume>(src: Src) -> Dst
+unsafe fn transmute<Src, Dst, Context, const ASSUME: Assume>(src: Src) -> Dst
 where
-    Dst: BikeshedIntrinsicFrom<Src, Scope, ASSUME>
+    Dst: BikeshedIntrinsicFrom<Src, Context, ASSUME>
 {
 
     #[repr(C)]
@@ -26,7 +26,7 @@ We could resolve this conflict by:
 2. placing `BikeshedIntrinsicFrom`, `Assume`, and this function under a new module (e.g., `mem::cast`)
 3. defining an associated function on `BikeshedIntrinsicFrom`; e.g.:   
     ```rust,ignore
-    pub unsafe trait BikeshedIntrinsicFrom<Src, Scope, const ASSUME: Assume>
+    pub unsafe trait BikeshedIntrinsicFrom<Src, Context, const ASSUME: Assume>
     where
         Src: ?Sized
     {

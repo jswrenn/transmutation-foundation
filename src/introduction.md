@@ -2,7 +2,7 @@
 
 We propose that this *compiler-intrinsic* trait (end-users *cannot* implement it) be added to `core::mem`:
 ```rust,ignore
-pub unsafe trait BikeshedIntrinsicFrom<Src, Scope, const ASSUME: Assume>
+pub unsafe trait BikeshedIntrinsicFrom<Src, Context, const ASSUME: Assume>
 where
     Src: ?Sized
 {}
@@ -23,7 +23,7 @@ In order to be **safe**, a well-defined transmutation must also not allow you to
 2. mutate hidden fields of the `Src` type
 3. construct hidden fields of the `Dst` type
 
-Whether these conditions are satisfied depends on the scope the transmutation occurs in. The existing mechanism of [type privacy](https://rust-lang.github.io/rfcs/2145-type-privacy.html) will ensure that first condition is satisfied. To enforce the second and third conditions, we introduce the `Scope` type parameter (see below). 
+Whether these conditions are satisfied depends on the scope the transmutation occurs in. The existing mechanism of [type privacy](https://rust-lang.github.io/rfcs/2145-type-privacy.html) will ensure that first condition is satisfied. To enforce the second and third conditions, we introduce the `Context` type parameter (see below). 
 
 ## What is `Assume`?
 The `Assume` parameter encodes the set of static checks that the compiler should ignore when determining transmutability. These checks include:
@@ -73,11 +73,11 @@ impl const core::ops::Add for Assume {
 
 **For more information, see [here](options.md).**
 
-## What is `Scope`?
-The `Scope` parameter of `BikeshedIntrinsicFrom` is used to ensure that the second and third safety conditions are satisfied.
+## What is `Context`?
+The `Context` parameter of `BikeshedIntrinsicFrom` is used to ensure that the second and third safety conditions are satisfied.
 
-When visibility is enforced, `Scope` must be instantiated with any private (i.e., `pub(self)` type. The compiler pretends that it is at the defining scope of that type, and checks that the necessary fields of `Src` and `Dst` are visible.
+When visibility is enforced, `Context` must be instantiated with any private (i.e., `pub(self)` type. The compiler pretends that it is at the defining scope of that type, and checks that the necessary fields of `Src` and `Dst` are visible.
 
-When visibility is assumed, the `Scope` parameter is ignored.
+When visibility is assumed, the `Context` parameter is ignored.
 
-**For more information, see [here](scope.md).**
+**For more information, see [here](context.md).**

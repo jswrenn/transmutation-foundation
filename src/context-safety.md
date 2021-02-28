@@ -4,7 +4,7 @@ In order to be safe, a well-defined transmutation must also not allow you to:
 2. mutate hidden fields of the `Src` type
 3. construct hidden fields of the `Dst` type
 
-Whether these conditions are satisfied depends on the scope the transmutation occurs in, because scope determines the visibility of fields. Consider:
+Whether these conditions are satisfied depends on the context of the transmutation, because scope determines the visibility of fields. Consider:
 ```rust
 mod a {
     use super::*;

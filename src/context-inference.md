@@ -1,4 +1,4 @@
-# Can't Scope be elided?
+# Can't Context be elided?
 
 **Not generally.**
 
@@ -25,18 +25,18 @@ pub mod zerocopy {
     }
 }
 ```
-The above definition leaves ambiguous (`???`) the scope in which the constructability of `Dst` is checked: is it from the perspective of where this trait is defined, or where this trait is *used*? In this example, you probably do *not* intend for this trait to *only* be usable with `Dst` types that are defined in the same scope as the `FromZeros` trait!
+The above definition leaves ambiguous (`???`) the context in which the constructability of `Dst` is checked: is it from the perspective of where this trait is defined, or where this trait is *used*? In this example, you probably do *not* intend for this trait to *only* be usable with `Dst` types that are defined in the same scope as the `FromZeros` trait!
 
-An explicit `Scope` parameter on `FromZeros` makes this unambiguous; the transmutability of `Dst` should be assessed from where the trait is used, *not* where it is defined:
+An explicit `Context` parameter on `FromZeros` makes this unambiguous; the transmutability of `Dst` should be assessed from where the trait is used, *not* where it is defined:
 ```rust,ignore
-pub unsafe trait FromZeros<Scope, const ASSUME: Assume> {
+pub unsafe trait FromZeros<Context, const ASSUME: Assume> {
     /// Safely initialize `Self` from zeroed bytes.
     fn zeroed() -> Self;
 }
 
-unsafe impl<Dst, Scope, const ASSUME: Assume> FromZeros<Scope, ASSUME> for Dst
+unsafe impl<Dst, Context, const ASSUME: Assume> FromZeros<Context, ASSUME> for Dst
 where
-    Dst: BikeshedIntrinsicFrom<[Zero; usize::MAX], Scope, ASSUME>
+    Dst: BikeshedIntrinsicFrom<[Zero; usize::MAX], Context, ASSUME>
 {
     fn zeroed() -> Self {
         unsafe { mem::transmute([Zero; size_of::<Self>]) }

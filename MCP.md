@@ -9,7 +9,7 @@ where
     Src: ?Sized
 {}
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Clone, Copy)]
 #[non_exhaustive]
 pub struct Assume {
     pub alignment   : bool,

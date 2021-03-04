@@ -1,6 +1,8 @@
+This MCP is a recommendation of the [Safe Transmute Working Group](https://github.com/rust-lang/project-safe-transmute). It provides a minimum, compiler-supported API surface that is capable of supporting the breadth of use-cases that involve [auditing](https://jswrenn.github.io/transmutation-foundation/use-case-auditing.html) and [abstracting](https://jswrenn.github.io/transmutation-foundation/use-case-abstraction.html) over transmutability. This API will provide a tangible foundation for experimentation.
+
 # Proposal
 
-Add a compiler-intrinsic trait be added to `core::mem` for checking the soundness of bit-reinterpretation casts (e.g., `mem::transmute`, `union`, pointer casting, etc.):
+Add a compiler-intrinsic trait to `core::mem` for checking the soundness of bit-reinterpretation casts (e.g., `mem::transmute`, `union`, pointer casting):
 ```rust
 pub unsafe trait BikeshedIntrinsicFrom<Src, Context, const ASSUME: Assume>
 where
@@ -65,6 +67,8 @@ impl const core::ops::Sub for Assume {
     }
 }
 ```
+
+**The remainder of this MCP provides supporting documentation for this design.**
 
 ## When is a bit-reinterpretation cast sound?
 
